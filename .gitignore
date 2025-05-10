@@ -14,3 +14,36 @@ node_modules
 
 # .DS_Store is only for Mac users
 **/.DS_Store
+.qodo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Dependency directories
+.pnpm-store/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Build directories
+dist
+build
+
+# IDE specific files
+.idea
+.vscode
+*.swp
+*.swo
