@@ -21,7 +21,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url('/images/site/checkerboard.jpg');
+  background-image: url('/images/site/small_check.jpg');
   background-repeat: repeat;
 }
 
@@ -189,6 +189,12 @@ footer {
 
 /* Desktop Styles */
 @media screen and (min-width: 769px) {
+  body {
+    background-image: url('/images/site/checkerboard.jpg');
+    background-repeat: repeat;
+    background-size: auto;
+  }
+
   #wrapper {
     border: 5px solid var(--primary-color);
     border-radius: 10px;
