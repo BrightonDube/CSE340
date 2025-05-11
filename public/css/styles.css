@@ -1,11 +1,9 @@
-/******* Change Box Model ***************/
 *,
 *:before,
 *:after {
   box-sizing: border-box;
 }
 
-/* Variables for consistent styling */
 :root {
   --primary-color: #01b0d3;
   --dark-color: #242332;
@@ -16,58 +14,58 @@
   --spacing-md: 20px;
 }
 
-/* General Styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url('/images/site/small_check.jpg');
-  background-repeat: repeat;
+  background: url('/images/site/small_check.jpg') repeat;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 h1,
 h2 {
   margin-top: 0;
 }
-
 a {
   text-decoration: none;
   color: var(--text-color);
 }
-
 ul {
   padding-left: var(--spacing-md);
   margin: 0;
 }
 
-/* Wrapper */
 #wrapper {
+  width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
   background-color: var(--white-color);
+  overflow: hidden;
 }
 
-/* Header */
 #top-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 .siteName a {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
-/* Navigation */
 nav {
   background-color: var(--dark-color);
+  width: 100%;
 }
 
 nav ul {
   display: flex;
   justify-content: space-evenly;
+  flex-wrap: wrap;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -82,24 +80,31 @@ nav ul li {
 nav ul li a {
   display: block;
   color: var(--white-color);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) 2px;
   text-align: center;
   width: 100%;
+  font-size: 0.85rem;
 }
 
 nav ul li a:hover {
   background-color: var(--primary-color);
 }
 
-/* Main Content */
 main {
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
+  width: 100%;
 }
 
-/* Delorean Showcase */
 #delorean-showcase {
   position: relative;
   margin-bottom: var(--spacing-md);
+  width: 100%;
+}
+
+#delorean-img img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 #delorean-info {
@@ -108,6 +113,8 @@ main {
   left: 0;
   padding: var(--spacing-sm);
   z-index: 1;
+  background-color: rgba(255, 255, 255, 0.7);
+  max-width: 50%;
 }
 
 #delorean-info h2 {
@@ -130,15 +137,13 @@ main {
   display: inline-block;
 }
 
-/* Delorean Sections */
 #delorean-sections {
   display: flex;
   flex-direction: column;
 }
 
-/* Reviews */
 #reviews ul {
-  list-style-type: none;
+  list-style: none;
   padding-left: 0;
 }
 
@@ -154,11 +159,11 @@ main {
   left: 0;
 }
 
-/* Upgrades */
 .upgrade-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .upgrade-item {
@@ -166,49 +171,53 @@ main {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  width: 100%;
 }
 
 .upgrade-img {
   background-color: var(--primary-color);
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1/1;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 5px;
+  max-width: 150px;
 }
 
 .upgrade-img img {
   max-width: 80%;
   max-height: 80%;
+  object-fit: contain;
 }
 
 .upgrade-item a {
   color: var(--text-color);
   font-weight: bold;
+  font-size: 0.9rem;
+  word-break: break-word;
 }
 
-/* Footer */
 footer {
   border-top: 1px solid #ccc;
   padding: var(--spacing-sm) var(--spacing-md);
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
-/* Desktop Styles */
 @media screen and (min-width: 769px) {
   body {
-    background-image: url('/images/site/checkerboard.jpg');
-    background-repeat: repeat;
-    background-size: auto;
+    background: url('/images/site/checkerboard.jpg') repeat;
   }
 
   #wrapper {
     border: 5px solid var(--primary-color);
     border-radius: 10px;
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    margin: var(--spacing-md) auto;
+  }
+
+  main {
+    padding: var(--spacing-md);
   }
 
   #delorean-sections {
@@ -221,6 +230,11 @@ footer {
     flex: 1;
   }
 
+  nav ul li a {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+  }
+
   .upgrade-img {
     width: 100px;
     height: 100px;
@@ -229,5 +243,9 @@ footer {
   #delorean-info {
     background-color: rgba(255, 255, 255, 0.8);
     max-width: 200px;
+  }
+
+  .upgrade-item a {
+    font-size: 1rem;
   }
 }
