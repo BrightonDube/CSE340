@@ -7,7 +7,7 @@
 
 /* Variables for consistent styling */
 :root {
-  --primary-color: #4c96d7;
+  --primary-color: #01b0d3;
   --dark-color: #3a3a3a;
   --text-color: #000;
   --white-color: #fff;
@@ -102,12 +102,12 @@ main {
 }
 
 #delorean-info h2 {
-  color: var(--primary-color);
+  color: var(--text-color);
   margin-bottom: var(--spacing-sm);
 }
 
 #delorean-info ul {
-  color: var(--primary-color);
+  color: var(--text-color);
   margin-bottom: var(--spacing-md);
   list-style: none;
   padding-left: 0;
@@ -115,7 +115,7 @@ main {
 
 #own-today .btn {
   background-color: var(--primary-color);
-  color: var(--white-color);
+  color: var(--text-color);
   padding: var(--spacing-sm);
   border-radius: 5px;
   display: inline-block;
