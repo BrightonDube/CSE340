@@ -1,6 +1,6 @@
 -- Type: account_type
 
--- DROP TYPE IF EXISTS public.account_type;
+DROP TYPE IF EXISTS public.account_type;
 
 CREATE TYPE public.account_type AS ENUM(
     'Client', 'Employee', 'Admin');
@@ -58,7 +58,7 @@ VALUES ('Custom'),
        ('Sedan');
 
 
--- Data for table `inventory`
+-- Data for table `inventory` I correctly copied this from the ...data.txt file!!!!!
 
 INSERT INTO public.inventory (
     inv_make,
@@ -241,15 +241,14 @@ VALUES   (
   );
 
 
+UPDATE public.inventory
+    SET inv_description = REPLACE(inv_description, 'small interiors', 'a huge interior')
+    WHERE inv_make = 'GM' AND inv_model = 'Hummer';
 
 UPDATE public.inventory
-SET inv_description = REPLACE(inv_description, 'small interiors', 'a huge interior')
-WHERE inv_make = 'GM' AND inv_model = 'Hummer';
-
-UPDATE public.inventory
-SET 
-    inv_image = REPLACE(inv_image, '/', '/vehicles/'),
-    inv_thumbnail = REPLACE(inv_thumbnail, '/', '/vehicles/')
-WHERE 
-    inv_image NOT LIKE '%/vehicles/%'
-    AND inv_thumbnail NOT LIKE '%/vehicles/%';
+    SET 
+        inv_image = REPLACE(inv_image, '/images/', '/images/vehicles/'),
+        inv_thumbnail = REPLACE(inv_thumbnail, '/images/', '/images/vehicles/')
+    WHERE 
+        inv_image NOT LIKE '%/images/vehicles/%'
+        OR inv_thumbnail NOT LIKE '%/images/vehicles/%';
