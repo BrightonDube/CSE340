@@ -6,7 +6,7 @@ CREATE TYPE public.account_type AS ENUM(
     'Client', 'Employee', 'Admin');
 
 ALTER TYPE public.account_type
-    OWNER TO cse340database_bd;
+    OWNER TO cse340bd;
 
 -- Table structure for table `classification`
 CREATE TABLE IF NOT EXISTS public.classification (
@@ -32,10 +32,9 @@ CREATE TABLE IF NOT EXISTS public.inventory
     CONSTRAINT inventory_pkey PRIMARY KEY (inv_id)
 );
 
-ALTER TABLE public.inventory
-    ADD CONSTRAINT fk_classification
-    FOREIGN KEY (classification_id)
-    REFERENCES public.classification (classification_id)
+ALTER TABLE IF EXISTS public.inventory
+    ADD CONSTRAINT fk_classification FOREIGN KEY (classification_id)
+    REFERENCES public.classification (classification_id) MATCH SIMPLE
     ON UPDATE CASCADE
     ON DELETE NO ACTION;
 
