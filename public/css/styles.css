@@ -205,6 +205,68 @@ footer {
   font-size: 0.875rem;
 }
 
+/* Inventory Classification Grid Styles */
+#inv-display {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+#inv-display li {
+  background-color: var(--white-color);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: var(--spacing-sm);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#inv-display li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#inv-display li img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.namePrice {
+  margin-top: var(--spacing-sm);
+}
+
+.namePrice h2 {
+  font-size: 1.25rem;
+  margin: var(--spacing-sm) 0;
+  color: var(--dark-color);
+}
+
+.namePrice a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.namePrice a:hover {
+  text-decoration: underline;
+}
+
+.namePrice span {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+@media (max-width: 600px) {
+  #inv-display {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media screen and (min-width: 769px) {
   body {
     background: url('/images/site/checkerboard.jpg') repeat;
