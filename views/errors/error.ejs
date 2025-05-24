@@ -1,0 +1,75 @@
+<div class="error-display text-center py-5">
+  <div class="error-animation">
+    <div class="car">
+      <div class="body"></div>
+      <div class="wheels">
+        <div class="wheel"></div>
+        <div class="wheel"></div>
+      </div>
+      <div class="smoke"></div>
+    </div>
+  </div>
+
+  <h1 class="display-4 text-danger mb-4">
+    <% if (status === 404) { %>
+      🚗💨 Whoops! We've Driven Off Course!
+    <% } else { %>
+      🚨 Engine Trouble Detected!
+    <% } %>
+  </h1>
+
+  <div class="error-message mb-4">
+    <p class="lead">
+      <%- message %>
+      <% if (status === 404) { %>
+        <br>
+        <small class="text-muted">
+          Our mechanics are searching the digital highway...
+        </small>
+      <% } %>
+    </p>
+  </div>
+
+  <div class="error-actions">
+    <a href="/" class="btn btn-primary btn-lg">
+      🏁 Return to Garage
+    </a>
+    <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+      🔄 Reverse Direction
+    </button>
+  </div>
+
+  <% if (status === 404) { %>
+    <div class="mt-4">
+      <small class="text-muted">
+        Error Code: 404 - Page not found
+        <br>
+        Suggested next pit stops:
+        <a href="/inventory">Inventory</a> | 
+        <a href="/about">About Us</a> | 
+        <a href="/contact">Contact</a>
+      </small>
+    </div>
+  <% } %>
+</div>
+
+<style>
+.error-animation {
+  position: relative;
+  height: 150px;
+  margin: 2rem auto;
+}
+
+.car {
+  position: absolute;
+  left: -200px;
+  animation: drive 4s ease-in infinite;
+}
+
+@keyframes drive {
+  0% { left: -200px; }
+  100% { left: 100%; }
+}
+
+/* Add CSS for car parts and smoke animation */
+</style>

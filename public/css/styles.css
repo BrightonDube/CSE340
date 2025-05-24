@@ -249,3 +249,231 @@ footer {
     font-size: 1rem;
   }
 }
+
+/* --- Error Page & Animation Styles --- */
+.error-display {
+  max-width: 600px;
+  margin: 3rem auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 2.5rem 2.5rem 2.5rem;
+  text-align: center;
+}
+
+.error-animation {
+  position: relative;
+  height: 130px;
+  margin: 2rem auto 1rem auto;
+}
+
+.car {
+  position: absolute;
+  left: -200px;
+  top: 40px;
+  width: 180px;
+  height: 70px;
+  animation: drive 4s linear infinite;
+  z-index: 2;
+}
+
+@keyframes drive {
+  0% { left: -200px; }
+  100% { left: 100%; }
+}
+
+.car .body {
+  width: 120px;
+  height: 40px;
+  background: #3a3a3a;
+  border-radius: 10px 20px 20px 10px;
+  position: absolute;
+  left: 30px;
+  top: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.car .wheels {
+  position: absolute;
+  left: 35px;
+  top: 40px;
+  width: 100px;
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+.car .wheel {
+  width: 28px;
+  height: 28px;
+  background: #222;
+  border-radius: 50%;
+  border: 4px solid #888;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.car .smoke {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(180,180,180,0.25);
+  filter: blur(2px);
+  animation: smoke 1.5s ease-in-out infinite;
+}
+@keyframes smoke {
+  0% { opacity: 0.7; transform: scale(1) translateY(0); }
+  80% { opacity: 0.2; transform: scale(1.5) translateY(-20px); }
+  100% { opacity: 0; transform: scale(2) translateY(-30px); }
+}
+
+.display-4 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+.text-danger {
+  color: #d32f2f;
+}
+.lead {
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+.text-center {
+  text-align: center;
+}
+.py-5 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+.mb-5 {
+  margin-bottom: 3rem;
+}
+.mt-4 {
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background: #eee;
+  border: 1px solid #bbb;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  margin: 0 0.5rem;
+  text-decoration: none;
+  color: #222;
+}
+.btn-primary {
+  background: #1976d2;
+  color: #fff;
+  border: 1px solid #1976d2;
+}
+.btn-primary:hover {
+  background: #1257a8;
+}
+.btn-outline-secondary {
+  background: #fff;
+  color: #444;
+  border: 1px solid #888;
+}
+.btn-outline-secondary:hover {
+  background: #f3f3f3;
+}
+.btn-lg {
+  font-size: 1.2rem;
+  padding: 1rem 2.5rem;
+}
+
+.error-message {
+  margin-bottom: 2rem;
+}
+
+.error-actions {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 600px) {
+  .error-display {
+    padding: 1rem 0.5rem 2rem 0.5rem;
+  }
+  .display-4 {
+    font-size: 1.5rem;
+  }
+  .car {
+    width: 100px;
+    height: 40px;
+  }
+  .car .body {
+    width: 70px;
+    height: 22px;
+    left: 15px;
+    top: 7px;
+  }
+  .car .wheels {
+    left: 17px;
+    top: 22px;
+    width: 60px;
+    height: 16px;
+  }
+  .car .wheel {
+    width: 14px;
+    height: 14px;
+    border-width: 2px;
+  }
+}
+
+  body {
+    background: url('/images/site/checkerboard.jpg') repeat;
+  }
+
+  #wrapper {
+    border: 5px solid var(--primary-color);
+    border-radius: 10px;
+    margin: var(--spacing-md) auto;
+  }
+
+  main {
+    padding: var(--spacing-md);
+  }
+
+  #delorean-sections {
+    flex-direction: row;
+    gap: var(--spacing-md);
+  }
+
+  #reviews,
+  #upgrades {
+    flex: 1;
+  }
+
+  nav ul li a {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+  }
+
+  .upgrade-img {
+    width: 100px;
+    height: 100px;
+  }
+
+  #delorean-info {
+    background-color: rgba(255, 255, 255, 0.8);
+    max-width: 200px;
+  }
+
+  .upgrade-item a {
+    font-size: 1rem;
+  }
+}
