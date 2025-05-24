@@ -312,6 +312,53 @@ footer {
   }
 }
 
+/* Vehicle Detail View Styles */
+.detail-container {
+  display: grid;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+@media screen and (min-width: 769px) {
+  .detail-container {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.detail-info {
+  padding: var(--spacing-sm);
+}
+
+.detail-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: var(--spacing-sm) 0;
+}
+
+.detail-specs {
+  list-style: none;
+  padding: 0;
+}
+
+.detail-specs li {
+  margin-bottom: var(--spacing-sm);
+  color: var(--dark-color);
+}
+
 /* --- Error Page & Animation Styles --- */
 .error-display {
   max-width: 600px;
