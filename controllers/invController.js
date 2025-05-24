@@ -19,6 +19,24 @@ invCont.buildByClassificationId = async function (req, res, next) {
   })
 }
 
+// ***************************
+// Build inventory detail view
+// ***************************
+invCont.buildByInventoryId = async function (req, res, next) {
+  const invId = req.params.inv_id;
+  const data = await invModel.getInventoryById(invId);
+  const detail = utilities.buildVehicleDetail(data);
+  const nav = await utilities.getNav();
+  res.render("./inventory/detail", {
+    title: `${data.inv_make} ${data.inv_model}`,
+    nav,
+    detail,
+  });
+};
 
+// Intentional Error for 500 test
+invCont.throwError = function (req, res, next) {
+  next(new Error('Intentional 500 error triggered'));
+};
 
 module.exports = invCont
