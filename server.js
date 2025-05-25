@@ -49,6 +49,7 @@ app.use(async (err, req, res, next) => {
     message = 'Oh no! There was a crash. Maybe try a different route?';
   }
   res.render("errors/error", {
+    status: err.status,
     title: err.status || 'Server Error',
     message,
     nav
