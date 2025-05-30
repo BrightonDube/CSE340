@@ -1,0 +1,53 @@
+<%- include('../../views/partials/header') %>
+
+<main class="container mt-4">
+  <h1 class="text-center mb-4">Add New Classification</h1>
+  
+  <% if (message) { %>
+    <div class="alert alert-<%= message.type || 'info' %>">
+      <%= message.text %>
+    </div>
+  <% } %>
+  
+  <% if (errors && errors.length > 0) { %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+  
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <form action="/inv/add-classification" method="post">
+            <div class="mb-3">
+              <label for="classification_name" class="form-label">Classification Name</label>
+              <input 
+                type="text" 
+                class="form-control <%= errors && errors.some(e => e.param === 'classification_name') ? 'is-invalid' : '' %>" 
+                id="classification_name" 
+                name="classification_name" 
+                required
+                pattern="^[a-zA-Z0-9]+"
+                title="No spaces or special characters allowed"
+                value="<%= classification_name || '' %>"
+              >
+              <div class="form-text">No spaces or special characters allowed</div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Add Classification</button>
+              <a href="/inv" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../../views/partials/footer') %>

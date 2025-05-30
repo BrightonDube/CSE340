@@ -1,7 +1,10 @@
 // Needed Resources 
 const express = require("express");
 const router = new express.Router();
+const bcrypt = require("bcryptjs");
+const { body, validationResult } = require("express-validator");
 const utilities = require("../utilities/");
+const accountModel = require("../models/account-model");
 const accountController = require("../controllers/accountController");
 const regValidate = require('../utilities/account-validation');
 
@@ -23,7 +26,7 @@ router.post(
       .withMessage("Password is required")
   ],
   async (req, res) => {
-    const { account_email } = req.body;
+    const { account_email, account_password } = req.body;
     const errors = validationResult(req);
     
     if (!errors.isEmpty()) {
@@ -41,8 +44,24 @@ router.post(
     }
     
     try {
-      // TODO: Add actual authentication logic here
-      // For now, just redirect to account view
+      // Get account by email
+      const account = await accountModel.getAccountByEmail(account_email);
+      
+      if (!account) {
+        req.flash("notice", "Invalid email or password.");
+        return res.redirect("/account/login");
+      }
+      
+      // Compare hashed password
+      const isMatch = await bcrypt.compare(account_password, account.account_password);
+      
+      if (!isMatch) {
+        req.flash("notice", "Invalid email or password.");
+        return res.redirect("/account/login");
+      }
+      
+      // If we get here, login was successful
+      // TODO: Set up session here
       res.redirect("/account/");
     } catch (error) {
       console.error("Login error:", error);
