@@ -32,6 +32,20 @@ router.post("/add-classification",
   utilities.handleErrors(invController.addClassification)
 );
 
+// Route to build add inventory view
+router.get("/add-inventory", 
+  isAuthenticated,
+  utilities.handleErrors(invController.buildAddInventory)
+);
+
+// Process add inventory
+router.post("/add-inventory",
+  isAuthenticated,
+  validate.inventoryRules(),
+  validate.checkInventoryData,
+  utilities.handleErrors(invController.addInventory)
+);
+
 // Intentional error route for testing error handler
 router.get("/error500", utilities.handleErrors(invController.throwError));
 
