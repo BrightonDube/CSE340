@@ -20,6 +20,7 @@
           placeholder="Enter your first name" 
           required
           class="form-control"
+          title="First name is required"
         >
       </div>
       
@@ -32,6 +33,7 @@
           placeholder="Enter your last name" 
           required
           class="form-control"
+          title="Last name is required"
         >
       </div>
       
@@ -44,6 +46,7 @@
           placeholder="Enter your email" 
           required
           class="form-control"
+          title="Please enter a valid email address"
         >
       </div>
       
@@ -58,15 +61,22 @@
             required
             class="form-control"
             minlength="12"
-            pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])(?=.{12,})$"
+            pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+            title="Password must be at least 12 characters and include at least one uppercase letter, one number, and one special character (!@#$%^&*)."
           >
           <button type="button" class="toggle-password" aria-label="Toggle password visibility">
             <i class="fas fa-eye"></i>
           </button>
         </div>
-        <small class="form-text text-muted">
-          Password must be at least 12 characters and include at least one uppercase letter, one number, and one special character (!@#$%^&*).
-        </small>
+        <div class="password-requirements">
+          <p><strong>Password Requirements:</strong></p>
+          <ul>
+            <li class="requirement" data-requirement="length">At least 12 characters</li>
+            <li class="requirement" data-requirement="uppercase">At least 1 uppercase letter (A-Z)</li>
+            <li class="requirement" data-requirement="number">At least 1 number (0-9)</li>
+            <li class="requirement" data-requirement="special">At least 1 special character (!@#$%^&*)</li>
+          </ul>
+        </div>
       </div>
       
       <div class="form-actions">
@@ -121,6 +131,69 @@
     border-color: var(--primary-color);
     outline: none;
     box-shadow: 0 0 0 2px rgba(1, 87, 155, 0.1);
+  }
+  
+  /* Form validation styles */
+  .form-control:required:invalid:not(:placeholder-shown) {
+    border-color: #dc3545;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+  }
+  
+  .form-control:required:valid:not(:placeholder-shown) {
+    border-color: #198754;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+  }
+  
+  /* Password requirements styling */
+  .password-requirements {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .password-requirements p {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .password-requirements ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+  
+  .password-requirements li {
+    margin-bottom: 0.25rem;
+    color: #6c757d;
+    position: relative;
+    list-style-type: none;
+    padding-left: 1.5rem;
+  }
+  
+  .password-requirements li:before {
+    content: '✗';
+    position: absolute;
+    left: 0;
+    color: #dc3545;
+  }
+  
+  .password-requirements li.valid {
+    color: #198754;
+  }
+  
+  .password-requirements li.valid:before {
+    content: '✓';
+    color: #198754;
   }
   
   .password-group {
@@ -203,18 +276,71 @@
 </style>
 
 <script>
-  // Toggle password visibility
-  document.addEventListener('DOMContentLoaded', function() {
-    const togglePassword = document.querySelector('.toggle-password');
-    const passwordInput = document.getElementById('account_password');
+  // Password validation function
+  function validatePassword(password) {
+    const requirements = {
+      length: /.{12,}/,
+      uppercase: /[A-Z]/,
+      number: /\d/,
+      special: /[^a-zA-Z0-9]/
+    };
     
-    if (togglePassword && passwordInput) {
-      togglePassword.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.querySelector('i').classList.toggle('fa-eye');
-        this.querySelector('i').classList.toggle('fa-eye-slash');
+    // Update requirement indicators
+    Object.keys(requirements).forEach(key => {
+      const requirement = document.querySelector(`[data-requirement="${key}"]`);
+      if (requirements[key].test(password)) {
+        requirement.classList.add('valid');
+      } else {
+        requirement.classList.remove('valid');
+      }
+    });
+    
+    // Check if all requirements are met
+    return Object.values(requirements).every(regex => regex.test(password));
+  }
+  
+  // Toggle password visibility
+  function togglePasswordVisibility(input, button) {
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+    const icon = button.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+  }
+  
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+    togglePasswordButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        togglePasswordVisibility(input, this);
+      });
+    });
+    
+    // Real-time password validation
+    const passwordInput = document.getElementById('account_password');
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function() {
+        validatePassword(this.value);
+      });
+      
+      // Initial validation in case of form refresh
+      validatePassword(passwordInput.value);
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        if (passwordInput && !validatePassword(passwordInput.value)) {
+          event.preventDefault();
+          // Ensure all requirements are visible
+          passwordInput.focus();
+        }
       });
     }
   });
+
 </script>

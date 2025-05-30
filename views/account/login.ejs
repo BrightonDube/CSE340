@@ -20,19 +20,39 @@
           placeholder="Enter your email" 
           required 
           class="form-control"
+          title="Please enter a valid email address"
+          autocomplete="username"
         >
       </div>
       
-      <div class="form-group">
+      <div class="form-group password-group">
         <label for="account_password">Password</label>
-        <input 
-          type="password" 
-          id="account_password" 
-          name="account_password" 
-          placeholder="Enter your password" 
-          required
-          class="form-control"
-        >
+        <div class="password-input-container">
+          <input 
+            type="password" 
+            id="account_password" 
+            name="account_password" 
+            placeholder="Enter your password" 
+            required
+            class="form-control"
+            minlength="12"
+            pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+            title="Password must be at least 12 characters and include at least one uppercase letter, one number, and one special character (!@#$%^&*)."
+            autocomplete="current-password"
+          >
+          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="password-requirements">
+          <p><strong>Password Requirements:</strong></p>
+          <ul>
+            <li class="requirement" data-requirement="length">At least 12 characters</li>
+            <li class="requirement" data-requirement="uppercase">At least 1 uppercase letter (A-Z)</li>
+            <li class="requirement" data-requirement="number">At least 1 number (0-9)</li>
+            <li class="requirement" data-requirement="special">At least 1 special character (!@#$%^&*)</li>
+          </ul>
+        </div>
       </div>
       
       <div class="form-actions">
@@ -57,6 +77,34 @@
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Form validation styles */
+  .form-control:required:invalid:not(:placeholder-shown) {
+    border-color: #dc3545;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+  }
+  
+  .form-control:required:valid:not(:placeholder-shown) {
+    border-color: #198754;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+  }
+  
+  /* Password requirements styling */
+  .password-requirements {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
   }
   
   .login-form {
@@ -136,3 +184,38 @@
     border-left: 4px solid #1565c0;
   }
 </style>
+
+<script>
+  // Toggle password visibility
+  function togglePasswordVisibility(input, button) {
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+    const icon = button.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+  }
+  
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+    togglePasswordButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        togglePasswordVisibility(input, this);
+      });
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        const passwordInput = document.getElementById('account_password');
+        if (passwordInput && !passwordInput.value) {
+          event.preventDefault();
+          passwordInput.focus();
+        }
+      });
+    }
+  });
+</script>
