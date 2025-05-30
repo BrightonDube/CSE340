@@ -5,7 +5,7 @@
 }
 
 :root {
-  --primary-color: #01b0d3;
+  --primary-color: #01579b; /* Darker blue for better contrast and accessibility */
   --dark-color: #242332;
   --text-color: #000;
   --white-color: #fff;
@@ -365,9 +365,10 @@ footer {
   margin: 3rem auto;
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  padding: 2rem 2.5rem 2.5rem 2.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  padding: 2.5rem 2.5rem 3rem 2.5rem;
   text-align: center;
+  border: 1px solid #e0e0e0; /* Add border for better definition */
 }
 
 .error-animation {
@@ -441,14 +442,17 @@ footer {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
+  color: #1a1a1a; /* Darker color for better contrast */
 }
 .text-danger {
-  color: #d32f2f;
+  color: #b71c1c; /* Darker red for better contrast */
 }
 .lead {
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 500; /* Slightly bolder for better readability */
   margin-bottom: 1rem;
+  color: #2c2c2c; /* Darker color for better contrast */
+  line-height: 1.6; /* Better line spacing */
 }
 .text-center {
   text-align: center;
@@ -485,12 +489,15 @@ footer {
   color: #222;
 }
 .btn-primary {
-  background: #1976d2;
+  background: #0d47a1; /* Darker blue for better contrast */
   color: #fff;
-  border: 1px solid #1976d2;
+  border: 1px solid #0d47a1;
+  font-weight: 600; /* Bolder text */
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* Improve text readability */
 }
 .btn-primary:hover {
-  background: #1257a8;
+  background: #0b3d91; /* Slightly darker on hover */
+  border-color: #0b3d91;
 }
 .btn-outline-secondary {
   background: #fff;
