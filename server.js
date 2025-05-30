@@ -7,6 +7,7 @@
  *************************/
 const express = require('express');
 const env = require('dotenv').config();
+const bodyParser = require('body-parser');
 const app = express();
 const static = require('./routes/static');
 const expressLayouts = require('express-ejs-layouts');
@@ -20,6 +21,9 @@ const pool = require('./database/');
 /* ***********************
  * Middleware
  * ************************/
+// Body parser middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(
   session({
     store: new (require('connect-pg-simple')(session))({
