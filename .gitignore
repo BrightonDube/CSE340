@@ -47,3 +47,6 @@ build
 .vscode
 *.swp
 *.swo
+
+# windsurf rules
+.windsurfrules
