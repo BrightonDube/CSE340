@@ -10,6 +10,16 @@
       </div>
     <% } %>
     
+    <% if (locals.errors && errors.array().length > 0) { %>
+      <div class="message error">
+        <ul>
+          <% errors.array().forEach(error => { %>
+            <li><%= error.msg %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+    
     <form action="/account/login" method="post" class="login-form">
       <div class="form-group">
         <label for="account_email">Email Address</label>
@@ -17,6 +27,7 @@
           type="email" 
           id="account_email" 
           name="account_email" 
+          value="<%= typeof(account_email) === 'string' ? account_email : '' %>"
           placeholder="Enter your email" 
           required 
           class="form-control"

@@ -1,5 +1,6 @@
 const utilities = require(".");
 const { body, validationResult } = require("express-validator");
+const accountModel = require("../models/account-model");
 const validate = {};
 
 /*  **********************************
@@ -57,15 +58,14 @@ validate.checkRegData = async (req, res, next) => {
   
   if (!errors.isEmpty()) {
     let nav = await utilities.getNav();
-    res.render("account/register", {
+    return res.render("account/register", {
       errors,
       title: "Registration",
       nav,
-      account_firstname,
-      account_lastname,
-      account_email,
+      account_firstname: account_firstname || '',
+      account_lastname: account_lastname || '',
+      account_email: account_email || ''
     });
-    return;
   }
   next();
 };
