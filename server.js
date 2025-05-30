@@ -69,20 +69,35 @@ app.use(async (req, res, next) => {
  * Place after all other middleware
  *************************/
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav();
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
-  let message;
-  if (err.status == 404) {
-    message = err.message;
-  } else {
-    message = 'Oh no! There was a crash. Maybe try a different route?';
+  try {
+    const nav = await utilities.getNav();
+    const status = err.status || 500;
+    const message = err.message || 'Internal Server Error';
+    
+    // Log the error
+    console.error(`Error ${status} at: "${req.originalUrl}": ${message}`);
+    console.error(err.stack);
+    
+    // Set the response status
+    res.status(status);
+    
+    // Determine the error title and message
+    const title = `${status} - ${status === 404 ? 'Not Found' : 'Server Error'}`;
+    const errorMessage = status === 404 
+      ? `Sorry, the page you're looking for doesn't exist.`
+      : 'Sorry, there was an error processing your request. Please try again later.';
+    
+    // Render the error page
+    res.render('errors/error', {
+      status,
+      title,
+      message: errorMessage,
+      nav,
+    });
+  } catch (renderError) {
+    console.error('Error rendering error page:', renderError);
+    res.status(500).send('An error occurred while rendering the error page.');
   }
-  res.render('errors/error', {
-    status: err.status,
-    title: err.status || 'Server Error',
-    message,
-    nav,
-  });
 });
 
 /* ***********************

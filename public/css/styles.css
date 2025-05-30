@@ -494,11 +494,12 @@ footer {
 }
 .btn-outline-secondary {
   background: #fff;
-  color: #444;
-  border: 1px solid #888;
+  color: #333;
+  border: 1px solid #666;
 }
 .btn-outline-secondary:hover {
-  background: #f3f3f3;
+  background: #f0f0f0;
+  color: #000;
 }
 .btn-lg {
   font-size: 1.2rem;
