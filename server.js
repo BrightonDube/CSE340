@@ -106,8 +106,9 @@ app.use(errorHandler);
  *************************/
 const port = process.env.PORT || 3000;
 const nodeEnv = process.env.NODE_ENV || 'development';
-// Use 0.0.0.0 in production to allow external connections, otherwise use localhost or HOST env variable
-const host = nodeEnv === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
+// Always use 0.0.0.0 on Render or in production to allow external connections
+const isRender = process.env.RENDER === 'true' || Boolean(process.env.RENDER_EXTERNAL_URL);
+const host = isRender || nodeEnv === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
 
 // Set environment
 app.set('env', nodeEnv);
@@ -116,7 +117,10 @@ app.set('env', nodeEnv);
  * Log statement to confirm server operation
  *************************/
 const server = app.listen(port, host, () => {
-  console.log(`Server running in ${nodeEnv} mode on http://${host}:${port}`);
+  // Display localhost in the log for better readability when binding to 0.0.0.0
+  const displayHost = host === '0.0.0.0' ? 'localhost' : host;
+  console.log(`Server running in ${nodeEnv} mode on http://${displayHost}:${port}`);
+  console.log(`Server bound to interface: ${host}`);
 });
 
 // Handle unhandled promise rejections
