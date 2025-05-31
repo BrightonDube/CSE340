@@ -105,8 +105,9 @@ app.use(errorHandler);
  * Values from .env (environment) file
  *************************/
 const port = process.env.PORT || 3000;
-const host = process.env.HOST || 'localhost';
 const nodeEnv = process.env.NODE_ENV || 'development';
+// Use 0.0.0.0 in production to allow external connections, otherwise use localhost or HOST env variable
+const host = nodeEnv === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
 
 // Set environment
 app.set('env', nodeEnv);
