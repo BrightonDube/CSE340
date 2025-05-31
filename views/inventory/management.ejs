@@ -1,7 +1,7 @@
 <%- include('../../views/partials/header') %>
 
-<main class="container mt-4">
-  <h1 class="text-center mb-4">Inventory Management</h1>
+<main class="container">
+  <h1>Inventory Management</h1>
   
   <% if (message) { %>
     <div class="alert alert-<%= message.type || 'info' %>">
@@ -9,17 +9,13 @@
     </div>
   <% } %>
   
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body text-center">
-          <h5 class="card-title">Management Options</h5>
-          <p class="card-text">Choose an option below to manage the inventory.</p>
-          <div class="d-grid gap-2">
-            <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
-            <a href="/inv/add-inventory" class="btn btn-primary">Add New Inventory</a>
-          </div>
-        </div>
+  <div class="management-container">
+    <div class="management-card">
+      <h2>Management Options</h2>
+      <p>Choose an option below to manage the inventory.</p>
+      <div class="management-actions">
+        <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
+        <a href="/inv/add-inventory" class="btn btn-primary">Add New Inventory</a>
       </div>
     </div>
   </div>

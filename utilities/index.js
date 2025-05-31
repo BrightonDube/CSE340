@@ -61,20 +61,20 @@ Util.buildClassificationGrid = async function(data){
  * Build vehicle detail view HTML
  * ************************************ */
 Util.buildVehicleDetail = function (data) {
-  let detail = '<div class="detail-container">';
-  detail += '<div class="detail-image">';
-  detail += '<img src="' + data.inv_image + '" alt="Image of ' + data.inv_make + ' ' + data.inv_model + '">';
-  detail += '</div>';
-  detail += '<div class="detail-info">';
-  detail += '<h2>' + data.inv_make + ' ' + data.inv_model + ' (' + data.inv_year + ')</h2>';
-  detail += '<p class="detail-price">$' + new Intl.NumberFormat('en-US').format(data.inv_price) + '</p>';
-  detail += '<ul class="detail-specs">';
-  detail += '<li><strong>Mileage:</strong> ' + new Intl.NumberFormat('en-US').format(data.inv_miles) + ' miles</li>';
-  detail += '<li><strong>Classification:</strong> ' + data.classification_name + '</li>';
-  detail += '<li><strong>Description:</strong> ' + data.inv_description + '</li>';
-  detail += '</ul>';
-  detail += '</div></div>';
-  return detail;
+  let grid = '<div class="detail-container">';
+  grid += '<div class="detail-image">';
+  grid += '<img src="' + data.inv_image + '" alt="Image of ' + data.inv_make + ' ' + data.inv_model + '">';
+  grid += '</div>';
+  grid += '<div class="detail-info">';
+  grid += '<h2>' + data.inv_make + ' ' + data.inv_model + ' (' + data.inv_year + ')</h2>';
+  grid += '<p class="detail-price">$' + new Intl.NumberFormat('en-US').format(data.inv_price) + '</p>';
+  grid += '<ul class="detail-specs">';
+  grid += '<li><strong>Mileage:</strong> ' + new Intl.NumberFormat('en-US').format(data.inv_miles) + ' miles</li>';
+  grid += '<li><strong>Classification:</strong> ' + data.classification_name + '</li>';
+  grid += '<li><strong>Description:</strong> ' + data.inv_description + '</li>';
+  grid += '</ul>';
+  grid += '</div></div>';
+  return grid;
 };
 
 /* ****************************************

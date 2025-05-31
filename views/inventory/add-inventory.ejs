@@ -1,5 +1,267 @@
-<main class="container mt-4">
-  <h1 class="text-center mb-4">Add New Inventory Item</h1>
+<%- include('../../views/partials/header') %>
+
+<style>
+  /* Modern styling with vanilla CSS */
+  * {
+    box-sizing: border-box;
+  }
+  
+  main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  /* Form Container */
+  .inventory-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  /* Page Title */
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  /* Form Card */
+  .form-wrapper {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+  }
+  
+  /* Form Sections */
+  .form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+  
+  .form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1.25rem;
+  }
+  
+  /* Form Fields */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .form-row .form-group {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 250px;
+  }
+  
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+    border-color: #4299e1;
+  }
+  
+  .helper-text {
+    color: #4a5568;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  
+  .invalid-feedback {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+  
+  input.is-invalid, select.is-invalid, textarea.is-invalid {
+    border-color: #e53e3e;
+  }
+  
+  input.is-invalid + .invalid-feedback,
+  select.is-invalid + .invalid-feedback,
+  textarea.is-invalid + .invalid-feedback {
+    display: block;
+  }
+  
+  /* Price Input Group */
+  .input-group {
+    display: flex;
+    align-items: stretch;
+  }
+  
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+  }
+  
+  .input-group input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  
+  /* Alert Messages */
+  .alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .alert-info {
+    background-color: #ebf8ff;
+    color: #1a4f8a;
+  }
+  
+  .alert-success {
+    background-color: #f0fff4;
+    color: #276749;
+  }
+  
+  .alert-danger {
+    background-color: #fff5f5;
+    color: #c53030;
+  }
+  
+  .alert ul {
+    margin: 0.5rem 0 0 1.5rem;
+    padding: 0;
+  }
+  
+  /* Buttons */
+  .btn-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary {
+    background-color: #3182ce;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2b6cb0;
+  }
+  
+  .btn-secondary {
+    background-color: #64748b;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #475569;
+  }
+  
+  /* Management View Styles */
+  .management-container {
+    display: flex;
+    justify-content: center;
+    margin: 2rem auto;
+  }
+  
+  .management-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .management-card h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+  
+  .management-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+    }
+    
+    .form-wrapper {
+      padding: 1.5rem;
+    }
+    
+    .form-group {
+      width: 100%;
+    }
+    
+    .btn-container {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+</style>
+
+<main>
+  <h1 class="page-title">Add New Inventory Item</h1>
   
   <% if (message) { %>
     <div class="alert alert-<%= message.type || 'info' %>">
@@ -9,7 +271,7 @@
   
   <% if (errors && errors.length > 0) { %>
     <div class="alert alert-danger">
-      <ul class="mb-0">
+      <ul>
         <% errors.forEach(error => { %>
           <li><%= error.msg %></li>
         <% }) %>
@@ -17,160 +279,181 @@
     </div>
   <% } %>
   
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card">
-        <div class="card-body">
+  <div class="inventory-container">
+    <div class="form-wrapper">
           <form action="/inv/add-inventory" method="post" id="inventoryForm">
-            <!-- Classification -->
-            <div class="mb-3">
-              <label for="classification_id" class="form-label">Classification</label>
-              <%- classificationList %>
-              <div class="invalid-feedback">Please select a classification.</div>
-            </div>
             
-            <!-- Make -->
-            <div class="mb-3">
-              <label for="inv_make" class="form-label">Make</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_make') ? 'is-invalid' : '' %>" 
-                id="inv_make" 
-                name="inv_make" 
-                required
-                value="<%= inv_make || '' %>"
-              >
-              <div class="invalid-feedback">Please provide a make.</div>
-            </div>
-            
-            <!-- Model -->
-            <div class="mb-3">
-              <label for="inv_model" class="form-label">Model</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_model') ? 'is-invalid' : '' %>" 
-                id="inv_model" 
-                name="inv_model" 
-                required
-                value="<%= inv_model || '' %>"
-              >
-              <div class="invalid-feedback">Please provide a model.</div>
-            </div>
-            
-            <!-- Year -->
-            <div class="mb-3">
-              <label for="inv_year" class="form-label">Year</label>
-              <input 
-                type="number" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_year') ? 'is-invalid' : '' %>" 
-                id="inv_year" 
-                name="inv_year" 
-                min="1900"
-                max="<%= new Date().getFullYear() + 1 %>"
-                required
-                value="<%= inv_year || '' %>"
-              >
-              <div class="invalid-feedback">Please provide a valid year between 1900 and <%= new Date().getFullYear() + 1 %>.</div>
-            </div>
-            
-            <!-- Description -->
-            <div class="mb-3">
-              <label for="inv_description" class="form-label">Description</label>
-              <textarea 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_description') ? 'is-invalid' : '' %>" 
-                id="inv_description" 
-                name="inv_description" 
-                rows="3"
-                required
-              ><%= inv_description || '' %></textarea>
-              <div class="invalid-feedback">Please provide a description.</div>
-            </div>
-            
-            <!-- Image Path -->
-            <div class="mb-3">
-              <label for="inv_image" class="form-label">Image Path</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_image') ? 'is-invalid' : '' %>" 
-                id="inv_image" 
-                name="inv_image" 
-                value="<%= inv_image || '/images/vehicles/no-image.png' %>"
-                required
-              >
-              <div class="form-text">Path to the vehicle image (e.g., /images/vehicles/vehicle-1.jpg)</div>
-              <div class="invalid-feedback">Please provide an image path.</div>
-            </div>
-            
-            <!-- Thumbnail Path -->
-            <div class="mb-3">
-              <label for="inv_thumbnail" class="form-label">Thumbnail Path</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_thumbnail') ? 'is-invalid' : '' %>" 
-                id="inv_thumbnail" 
-                name="inv_thumbnail" 
-                value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
-                required
-              >
-              <div class="form-text">Path to the vehicle thumbnail (e.g., /images/vehicles/vehicle-1-tn.jpg)</div>
-              <div class="invalid-feedback">Please provide a thumbnail path.</div>
-            </div>
-            
-            <!-- Price -->
-            <div class="mb-3">
-              <label for="inv_price" class="form-label">Price</label>
-              <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input 
-                  type="number" 
-                  class="form-control <%= errors && errors.some(e => e.param === 'inv_price') ? 'is-invalid' : '' %>" 
-                  id="inv_price" 
-                  name="inv_price" 
-                  step="0.01"
-                  min="0"
-                  required
-                  value="<%= inv_price || '' %>"
-                >
+            <!-- Vehicle Information Section -->
+            <div class="form-section">
+              <h3 class="section-title">Vehicle Information</h3>
+              
+              <!-- Classification -->
+              <div class="form-group">
+                <label for="classification_id">Classification</label>
+                <%- classificationList.replace('class="form-select"', '') %>
+                <div class="invalid-feedback">Please select a classification.</div>
               </div>
-              <div class="invalid-feedback">Please provide a valid price (must be 0 or greater).</div>
+              
+              <div class="form-row">
+                <!-- Make -->
+                <div class="form-group">
+                  <label for="inv_make">Make</label>
+                  <input 
+                    type="text" 
+                    class="<%= errors && errors.some(e => e.param === 'inv_make') ? 'is-invalid' : '' %>" 
+                    id="inv_make" 
+                    name="inv_make" 
+                    required
+                    value="<%= inv_make || '' %>"
+                  >
+                  <div class="invalid-feedback">Please provide a make.</div>
+                </div>
+                
+                <!-- Model -->
+                <div class="form-group">
+                  <label for="inv_model">Model</label>
+                  <input 
+                    type="text" 
+                    class="<%= errors && errors.some(e => e.param === 'inv_model') ? 'is-invalid' : '' %>" 
+                    id="inv_model" 
+                    name="inv_model" 
+                    required
+                    value="<%= inv_model || '' %>"
+                  >
+                  <div class="invalid-feedback">Please provide a model.</div>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <!-- Year -->
+                <div class="form-group">
+                  <label for="inv_year">Year</label>
+                  <input 
+                    type="number" 
+                    class="<%= errors && errors.some(e => e.param === 'inv_year') ? 'is-invalid' : '' %>" 
+                    id="inv_year" 
+                    name="inv_year" 
+                    min="1900"
+                    max="<%= new Date().getFullYear() + 1 %>"
+                    required
+                    value="<%= inv_year || '' %>"
+                  >
+                  <div class="invalid-feedback">Please provide a valid year between 1900 and <%= new Date().getFullYear() + 1 %>.</div>
+                </div>
+                
+                <!-- Color -->
+                <div class="form-group">
+                  <label for="inv_color">Color</label>
+                  <input 
+                    type="text" 
+                    class="<%= errors && errors.some(e => e.param === 'inv_color') ? 'is-invalid' : '' %>" 
+                    id="inv_color" 
+                    name="inv_color" 
+                    required
+                    value="<%= inv_color || '' %>"
+                  >
+                  <div class="invalid-feedback">Please provide a color.</div>
+                </div>
+              </div>
+              
+              <!-- Description -->
+              <div class="form-group">
+                <label for="inv_description">Description</label>
+                <textarea 
+                  class="<%= errors && errors.some(e => e.param === 'inv_description') ? 'is-invalid' : '' %>" 
+                  id="inv_description" 
+                  name="inv_description" 
+                  rows="3"
+                  required
+                ><%= inv_description || '' %></textarea>
+                <div class="invalid-feedback">Please provide a description.</div>
+              </div>
             </div>
             
-            <!-- Miles -->
-            <div class="mb-3">
-              <label for="inv_miles" class="form-label">Miles</label>
-              <input 
-                type="number" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_miles') ? 'is-invalid' : '' %>" 
-                id="inv_miles" 
-                name="inv_miles" 
-                min="0"
-                required
-                value="<%= inv_miles || '' %>"
-              >
-              <div class="invalid-feedback">Please provide a valid mileage (must be 0 or greater).</div>
+            <!-- Images Section -->
+            <div class="form-section">
+              <h3 class="section-title">Vehicle Images</h3>
+              
+              <!-- Image Path -->
+              <div class="form-group">
+                <label for="inv_image">Image Path</label>
+                <input 
+                  type="text" 
+                  class="<%= errors && errors.some(e => e.param === 'inv_image') ? 'is-invalid' : '' %>" 
+                  id="inv_image" 
+                  name="inv_image" 
+                  value="<%= inv_image || '/images/vehicles/no-image.png' %>"
+                  required
+                >
+                <div class="helper-text">Path to the vehicle image (e.g., /images/vehicles/vehicle-1.jpg)</div>
+                <div class="invalid-feedback">Please provide an image path.</div>
+              </div>
+              
+              <!-- Thumbnail Path -->
+              <div class="form-group">
+                <label for="inv_thumbnail">Thumbnail Path</label>
+                <input 
+                  type="text" 
+                  class="<%= errors && errors.some(e => e.param === 'inv_thumbnail') ? 'is-invalid' : '' %>" 
+                  id="inv_thumbnail" 
+                  name="inv_thumbnail" 
+                  value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
+                  required
+                >
+                <div class="helper-text">Path to the vehicle thumbnail (e.g., /images/vehicles/vehicle-1-tn.jpg)</div>
+                <div class="invalid-feedback">Please provide a thumbnail path.</div>
+              </div>
             </div>
             
-            <!-- Color -->
-            <div class="mb-3">
-              <label for="inv_color" class="form-label">Color</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'inv_color') ? 'is-invalid' : '' %>" 
-                id="inv_color" 
-                name="inv_color" 
-                required
-                value="<%= inv_color || '' %>"
-              >
-              <div class="invalid-feedback">Please provide a color.</div>
+            <!-- Specifications Section -->
+            <div class="form-section">
+              <h3 class="section-title">Vehicle Specifications</h3>
+              
+              <div class="form-row">
+                <!-- Price -->
+                <div class="form-group">
+                  <label for="inv_price">Price</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input 
+                      type="number" 
+                      class="<%= errors && errors.some(e => e.param === 'inv_price') ? 'is-invalid' : '' %>" 
+                      id="inv_price" 
+                      name="inv_price" 
+                      step="0.01"
+                      min="0"
+                      required
+                      value="<%= inv_price || '' %>"
+                    >
+                  </div>
+                  <div class="invalid-feedback">Please provide a valid price (must be 0 or greater).</div>
+                </div>
+                
+                <!-- Miles -->
+                <div class="form-group">
+                  <label for="inv_miles">Miles</label>
+                  <input 
+                    type="number" 
+                    class="<%= errors && errors.some(e => e.param === 'inv_miles') ? 'is-invalid' : '' %>" 
+                    id="inv_miles" 
+                    name="inv_miles" 
+                    min="0"
+                    required
+                    value="<%= inv_miles || '' %>"
+                  >
+                  <div class="invalid-feedback">Please provide a valid mileage (must be 0 or greater).</div>
+                </div>
+              </div>
             </div>
             
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-              <button type="submit" class="btn btn-primary me-md-2">Add Vehicle</button>
-              <a href="/inv" class="btn btn-secondary">Cancel</a>
+            <!-- Action Section -->
+            <div class="form-section">
+              <div class="btn-container">
+                <a href="/inv" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Add Vehicle</button>
+              </div>
             </div>
           </form>
-        </div>
-      </div>
     </div>
   </div>
 </main>

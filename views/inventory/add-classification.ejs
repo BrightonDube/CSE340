@@ -1,7 +1,7 @@
 <%- include('../../views/partials/header') %>
 
-<main class="container mt-4">
-  <h1 class="text-center mb-4">Add New Classification</h1>
+<main class="container">
+  <h1>Add New Classification</h1>
   
   <% if (message) { %>
     <div class="alert alert-<%= message.type || 'info' %>">
@@ -11,7 +11,7 @@
   
   <% if (errors && errors.length > 0) { %>
     <div class="alert alert-danger">
-      <ul class="mb-0">
+      <ul>
         <% errors.forEach(error => { %>
           <li><%= error.msg %></li>
         <% }) %>
@@ -19,35 +19,36 @@
     </div>
   <% } %>
   
-  <div class="row justify-content-center">
-    <div class="col-lg-6">
-      <div class="card">
-        <div class="card-body">
-          <form action="/inv/add-classification" method="post" id="classificationForm">
-            <div class="mb-3">
-              <label for="classification_name" class="form-label">Classification Name</label>
-              <input 
-                type="text" 
-                class="form-control <%= errors && errors.some(e => e.param === 'classification_name') ? 'is-invalid' : '' %>" 
-                id="classification_name" 
-                name="classification_name" 
-                required
-                value="<%= classification_name || '' %>"
-                pattern="^[a-zA-Z0-9]+$"
-                title="Classification name must not contain spaces or special characters"
-              >
-              <div class="form-text">Enter a name for the new classification (no spaces or special characters).</div>
-              <div class="invalid-feedback">
-                Please provide a valid classification name with no spaces or special characters.
-              </div>
+  <div class="form-container">
+    <div class="form-content">
+      <form action="/inv/add-classification" method="post" id="classificationForm">
+        <div class="form-section">
+          <div class="form-group">
+            <label for="classification_name">Classification Name</label>
+            <input 
+              type="text" 
+              class="<%= errors && errors.some(e => e.param === 'classification_name') ? 'is-invalid' : '' %>" 
+              id="classification_name" 
+              name="classification_name" 
+              required
+              value="<%= classification_name || '' %>"
+              pattern="^[a-zA-Z0-9]+$"
+              title="Classification name must not contain spaces or special characters"
+            >
+            <div class="helper-text">Enter a name for the new classification (no spaces or special characters).</div>
+            <div class="invalid-feedback">
+              Please provide a valid classification name with no spaces or special characters.
             </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-              <button type="submit" class="btn btn-primary me-md-2">Add Classification</button>
-              <a href="/inv" class="btn btn-secondary">Cancel</a>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
+        
+        <div class="form-section">
+          <div class="btn-container">
+            <a href="/inv" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Add Classification</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </main>

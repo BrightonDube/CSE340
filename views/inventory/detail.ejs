@@ -4,8 +4,12 @@
   <% res.redirect('/') %>
 <% } %>
 
-<!-- Message Block: future error/info messages -->
-<%# messages() %>
+<!-- Message Block -->
+<% if (message) { %>
+  <div class="alert alert-info">
+    <%- message %>
+  </div>
+<% } %>
 
 <!-- Vehicle Detail Display -->
-<%- detail %>
+<%- grid %>
