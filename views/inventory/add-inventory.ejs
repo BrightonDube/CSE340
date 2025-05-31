@@ -1,5 +1,3 @@
-<%- include('../../views/partials/header') %>
-
 <main class="container mt-4">
   <h1 class="text-center mb-4">Add New Inventory Item</h1>
   
@@ -23,11 +21,12 @@
     <div class="col-lg-8">
       <div class="card">
         <div class="card-body">
-          <form action="/inv/add-inventory" method="post">
+          <form action="/inv/add-inventory" method="post" id="inventoryForm">
             <!-- Classification -->
             <div class="mb-3">
               <label for="classification_id" class="form-label">Classification</label>
               <%- classificationList %>
+              <div class="invalid-feedback">Please select a classification.</div>
             </div>
             
             <!-- Make -->
@@ -41,6 +40,7 @@
                 required
                 value="<%= inv_make || '' %>"
               >
+              <div class="invalid-feedback">Please provide a make.</div>
             </div>
             
             <!-- Model -->
@@ -54,6 +54,7 @@
                 required
                 value="<%= inv_model || '' %>"
               >
+              <div class="invalid-feedback">Please provide a model.</div>
             </div>
             
             <!-- Year -->
@@ -69,6 +70,7 @@
                 required
                 value="<%= inv_year || '' %>"
               >
+              <div class="invalid-feedback">Please provide a valid year between 1900 and <%= new Date().getFullYear() + 1 %>.</div>
             </div>
             
             <!-- Description -->
@@ -81,6 +83,7 @@
                 rows="3"
                 required
               ><%= inv_description || '' %></textarea>
+              <div class="invalid-feedback">Please provide a description.</div>
             </div>
             
             <!-- Image Path -->
@@ -94,6 +97,8 @@
                 value="<%= inv_image || '/images/vehicles/no-image.png' %>"
                 required
               >
+              <div class="form-text">Path to the vehicle image (e.g., /images/vehicles/vehicle-1.jpg)</div>
+              <div class="invalid-feedback">Please provide an image path.</div>
             </div>
             
             <!-- Thumbnail Path -->
@@ -107,6 +112,8 @@
                 value="<%= inv_thumbnail || '/images/vehicles/no-image-tn.png' %>"
                 required
               >
+              <div class="form-text">Path to the vehicle thumbnail (e.g., /images/vehicles/vehicle-1-tn.jpg)</div>
+              <div class="invalid-feedback">Please provide a thumbnail path.</div>
             </div>
             
             <!-- Price -->
@@ -125,6 +132,7 @@
                   value="<%= inv_price || '' %>"
                 >
               </div>
+              <div class="invalid-feedback">Please provide a valid price (must be 0 or greater).</div>
             </div>
             
             <!-- Miles -->
@@ -139,6 +147,7 @@
                 required
                 value="<%= inv_miles || '' %>"
               >
+              <div class="invalid-feedback">Please provide a valid mileage (must be 0 or greater).</div>
             </div>
             
             <!-- Color -->
@@ -152,9 +161,10 @@
                 required
                 value="<%= inv_color || '' %>"
               >
+              <div class="invalid-feedback">Please provide a color.</div>
             </div>
             
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
               <button type="submit" class="btn btn-primary me-md-2">Add Vehicle</button>
               <a href="/inv" class="btn btn-secondary">Cancel</a>
             </div>
@@ -166,3 +176,83 @@
 </main>
 
 <%- include('../../views/partials/footer') %>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('inventoryForm');
+  if (!form) return;
+  
+  // Add validation on form submission
+  form.addEventListener('submit', function(event) {
+    let isValid = true;
+    
+    // Reset all invalid states
+    const invalidInputs = form.querySelectorAll('.is-invalid');
+    invalidInputs.forEach(input => input.classList.remove('is-invalid'));
+    
+    // Validate required fields
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('is-invalid');
+        if (isValid) field.focus();
+        isValid = false;
+      }
+    });
+    
+    // Validate year
+    const yearInput = document.getElementById('inv_year');
+    if (yearInput && yearInput.value) {
+      const year = parseInt(yearInput.value);
+      const currentYear = new Date().getFullYear();
+      if (isNaN(year) || year < 1900 || year > currentYear + 1) {
+        yearInput.classList.add('is-invalid');
+        if (isValid) yearInput.focus();
+        isValid = false;
+      }
+    }
+    
+    // Validate price
+    const priceInput = document.getElementById('inv_price');
+    if (priceInput && priceInput.value) {
+      const price = parseFloat(priceInput.value);
+      if (isNaN(price) || price < 0) {
+        priceInput.classList.add('is-invalid');
+        if (isValid) priceInput.focus();
+        isValid = false;
+      }
+    }
+    
+    // Validate miles
+    const milesInput = document.getElementById('inv_miles');
+    if (milesInput && milesInput.value) {
+      const miles = parseInt(milesInput.value);
+      if (isNaN(miles) || miles < 0) {
+        milesInput.classList.add('is-invalid');
+        if (isValid) milesInput.focus();
+        isValid = false;
+      }
+    }
+    
+    if (!isValid) {
+      event.preventDefault();
+      // Scroll to the first invalid field
+      const firstInvalid = form.querySelector('.is-invalid');
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+  
+  // Remove invalid class when user starts typing
+  const inputs = form.querySelectorAll('input, textarea, select');
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) {
+        this.classList.remove('is-invalid');
+      }
+    });
+  });
+});
+</script>

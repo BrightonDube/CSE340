@@ -1,0 +1,46 @@
+<main class="container">
+  <div class="account-container">
+    <h1 class="text-center"><%= title %></h1>
+    
+    <% if (locals.message) { %>
+      <div class="message <%= message.type || 'info' %>">
+        <%- message.text %>
+      </div>
+    <% } %>
+    
+    <% if (messages) { %>
+      <% Object.keys(messages).forEach(function (type) { %>
+        <div class="message <%= type %>">
+          <% messages[type].forEach(function (message) { %>
+            <p><%- message %></p>
+          <% }) %>
+        </div>
+      <% }) %>
+    <% } %>
+    
+    <% if (account) { %>
+      <section class="account-info">
+        <h2>Account Information</h2>
+        <div class="account-details">
+          <p><strong>First Name:</strong> <%= account.account_firstname %></p>
+          <p><strong>Last Name:</strong> <%= account.account_lastname %></p>
+          <p><strong>Email:</strong> <%= account.account_email %></p>
+          <p><strong>Account Type:</strong> <%= account.account_type %></p>
+        </div>
+        
+        <div class="account-actions">
+          <h3>Account Management</h3>
+          <ul>
+            <li><a href="/account/update/<%= account.account_id %>" class="btn btn-primary">Update Account Information</a></li>
+            <li><a href="/account/change-password" class="btn btn-secondary">Change Password</a></li>
+            <% if (account.account_type === 'Admin' || account.account_type === 'Employee') { %>
+              <li><a href="/inv" class="btn btn-info">Inventory Management</a></li>
+            <% } %>
+          </ul>
+        </div>
+      </section>
+    <% } else { %>
+      <p class="message error">You must be logged in to view this page. <a href="/account/login">Log in</a></p>
+    <% } %>
+  </div>
+</main>

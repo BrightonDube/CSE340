@@ -84,4 +84,18 @@ Util.buildVehicleDetail = function (data) {
  **************************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
+/* **************************************
+ * Build Classification List for Form Dropdown
+* ************************************ */
+Util.buildClassificationList = async function() {
+  const data = await invModel.getClassifications();
+  let classificationList = '<select name="classification_id" id="classification_id" class="form-select" required>';
+  classificationList += '<option value="">Choose a Classification</option>';
+  data.rows.forEach(row => {
+    classificationList += `<option value="${row.classification_id}">${row.classification_name}</option>`;
+  });
+  classificationList += '</select>';
+  return classificationList;
+};
+
 module.exports = Util

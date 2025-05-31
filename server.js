@@ -7,6 +7,7 @@
  *************************/
 const express = require('express');
 const env = require('dotenv').config();
+const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const static = require('./routes/static');
@@ -17,6 +18,8 @@ const inventoryRoute = require('./routes/inventoryRoute');
 const accountRoute = require('./routes/accountRoute');
 const session = require('express-session');
 const pool = require('./database/');
+const { notFound, errorHandler, validationErrorHandler, databaseErrorHandler } = require('./utilities/error-handler');
+
 
 /* ***********************
  * Middleware
@@ -29,20 +32,40 @@ app.use(
     store: new (require('connect-pg-simple')(session))({
       createTableIfMissing: true,
       pool,
+      tableName: 'session'
     }),
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET || 'your_fallback_secret',
+    resave: false,
+    saveUninitialized: false,
     name: 'sessionId',
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    }
   })
 );
 
 // Express Messages Middleware
-app.use(require('connect-flash')());
+const flash = require('connect-flash');
+app.use(flash());
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
 });
+
+// Set up static directory
+// Make session data available to all templates
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set up views directory
+app.set('views', path.join(__dirname, 'views'));
 
 /* ***********************
  * View Engine and Templates
@@ -57,63 +80,56 @@ app.set('layout', './layouts/layout'); // not at views root
 app.use(static);
 
 // Index route
-app.get('/', utilities.handleErrors(baseController.buildHome));
+app.get('/', baseController.buildHome);
+
 // Inventory routes
 app.use('/inv', inventoryRoute);
 
 // Account routes
 app.use('/account', accountRoute);
 
-// File Not Found Route - must be last route in list
-app.use(async (req, res, next) => {
-  next({ status: 404, message: 'Sorry, we appear to have lost that page.' });
-});
-/* ***********************
- * Express Error Handler
- * Place after all other middleware
- *************************/
-app.use(async (err, req, res, next) => {
-  try {
-    const nav = await utilities.getNav();
-    const status = err.status || 500;
-    const message = err.message || 'Internal Server Error';
-    
-    // Log the error
-    console.error(`Error ${status} at: "${req.originalUrl}": ${message}`);
-    console.error(err.stack);
-    
-    // Set the response status
-    res.status(status);
-    
-    // Determine the error title and message
-    const title = `${status} - ${status === 404 ? 'Not Found' : 'Server Error'}`;
-    const errorMessage = status === 404 
-      ? `Sorry, the page you're looking for doesn't exist.`
-      : 'Sorry, there was an error processing your request. Please try again later.';
-    
-    // Render the error page
-    res.render('errors/error', {
-      status,
-      title,
-      message: errorMessage,
-      nav,
-    });
-  } catch (renderError) {
-    console.error('Error rendering error page:', renderError);
-    res.status(500).send('An error occurred while rendering the error page.');
-  }
-});
+// 404 Not Found Handler
+app.use(notFound);
+
+// Database Error Handler
+app.use(databaseErrorHandler);
+
+// Validation Error Handler
+app.use(validationErrorHandler);
+
+// General Error Handler
+app.use(errorHandler);
 
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT;
-const host = process.env.HOST;
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || 'localhost';
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+// Set environment
+app.set('env', nodeEnv);
 
 /* ***********************
  * Log statement to confirm server operation
  *************************/
-app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`);
+const server = app.listen(port, host, () => {
+  console.log(`Server running in ${nodeEnv} mode on http://${host}:${port}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.error(`Error: ${err.message}`);
+  // Close server & exit process
+  server.close(() => process.exit(1));
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION! Shutting down...');
+  console.error(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });

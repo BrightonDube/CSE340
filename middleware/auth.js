@@ -4,14 +4,14 @@
 
 // Check if user is authenticated
 const isAuthenticated = (req, res, next) => {
-  // TODO: Replace this with actual session check
-  // For now, we'll just check if the user is logged in
-  if (req.session && req.session.account_id) {
+  // Check if user is logged in using session data
+  if (req.session && req.session.user && req.session.loggedin) {
     return next();
   }
   
   // Not authenticated
   req.flash('notice', 'Please log in to access this page.');
+  req.session.returnTo = req.originalUrl;
   return res.redirect('/account/login');
 };
 

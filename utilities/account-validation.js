@@ -1,51 +1,289 @@
 const utilities = require(".");
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, checkSchema } = require("express-validator");
 const accountModel = require("../models/account-model");
 const validate = {};
+
+// Common validation patterns
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+const NAME_PATTERN = /^[A-Za-z\s-']+$/;
+const EMAIL_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'byui.edu'];
 
 /*  **********************************
  *  Registration Data Validation Rules
  * ********************************* */
-validate.registationRules = () => {
+validate.registrationRules = () => {
   return [
-    // firstname is required and must be string
+    // First name validation
     body("account_firstname")
       .trim()
       .escape()
       .notEmpty()
-      .isLength({ min: 1 })
-      .withMessage("Please provide a first name."),
+      .withMessage("First name is required.")
+      .isLength({ min: 2, max: 50 })
+      .withMessage("First name must be between 2-50 characters.")
+      .matches(NAME_PATTERN)
+      .withMessage("First name can only contain letters, spaces, hyphens, and apostrophes."),
 
-    // lastname is required and must be string
+    // Last name validation
     body("account_lastname")
       .trim()
       .escape()
       .notEmpty()
-      .isLength({ min: 2 })
-      .withMessage("Please provide a last name."),
+      .withMessage("Last name is required.")
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Last name must be between 2-50 characters.")
+      .matches(NAME_PATTERN)
+      .withMessage("Last name can only contain letters, spaces, hyphens, and apostrophes."),
 
-    // valid email is required and cannot already exist in the DB
+    // Email validation
+    body("account_email")
+      .trim()
+      .isEmail()
+      .normalizeEmail() // refer to validator.js docs
+      .withMessage("A valid email is required.")
+      .custom(async (account_email) => {
+        const emailExists = await accountModel.checkExistingEmail(account_email)
+        if (emailExists){
+          throw new Error("Email exists. Please log in or use different email")
+        }
+      }),
+
+    // Password validation
+    body("account_password")
+      .trim()
+      .notEmpty()
+      .withMessage("Password is required.")
+      .isLength({ min: 12, max: 100 })
+      .withMessage("Password must be between 12-100 characters.")
+      .matches(PASSWORD_PATTERN)
+      .withMessage(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+      ),
+
+    // Confirm password validation
+    body("account_confirm_password")
+      .trim()
+      .notEmpty()
+      .withMessage("Please confirm your password.")
+      .custom((value, { req }) => {
+        if (value !== req.body.account_password) {
+          throw new Error("Passwords do not match.");
+        }
+        return true;
+      })
+  ];
+};
+
+/*  **********************************
+ *  Login Validation Rules
+ * ********************************* */
+validate.loginRules = () => {
+  return [
+    // Email validation
     body("account_email")
       .trim()
       .escape()
       .notEmpty()
+      .withMessage("Email is required.")
       .isEmail()
-      .normalizeEmail()
-      .withMessage("A valid email is required."),
+      .withMessage("Please provide a valid email address.")
+      .normalizeEmail(),
 
-    // password is required and must be strong password
+    // Password validation
     body("account_password")
       .trim()
       .notEmpty()
-      .isStrongPassword({
-        minLength: 12,
-        minLowercase: 1,
-        minUppercase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-      })
-      .withMessage("Password does not meet requirements."),
+      .withMessage("Password is required.")
   ];
+};
+
+/*  **********************************
+ *  Update Profile Validation Rules
+ * ********************************* */
+validate.updateProfileRules = () => {
+  return [
+    // First name validation
+    body("account_firstname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("First name is required.")
+      .isLength({ min: 2, max: 50 })
+      .withMessage("First name must be between 2-50 characters.")
+      .matches(NAME_PATTERN)
+      .withMessage("First name can only contain letters, spaces, hyphens, and apostrophes."),
+
+    // Last name validation
+    body("account_lastname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Last name is required.")
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Last name must be between 2-50 characters.")
+      .matches(NAME_PATTERN)
+      .withMessage("Last name can only contain letters, spaces, hyphens, and apostrophes."),
+
+    // Email validation
+    body("account_email")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Email is required.")
+      .isEmail()
+      .withMessage("Please provide a valid email address.")
+      .normalizeEmail()
+      .isLength({ max: 100 })
+      .withMessage("Email must be less than 100 characters.")
+      .custom(async (email, { req }) => {
+        // Skip if email hasn't changed
+        if (email === req.body.original_email) {
+          return true;
+        }
+        
+        const account = await accountModel.getAccountByEmail(email);
+        if (account) {
+          throw new Error('Email is already in use. Please use a different email.');
+        }
+        return true;
+      }),
+      
+    // Phone number validation
+    body("account_phone")
+      .optional({ checkFalsy: true })
+      .trim()
+      .isMobilePhone()
+      .withMessage("Please provide a valid phone number.")
+  ];
+};
+
+/*  **********************************
+ *  Change Password Validation Rules
+ * ********************************* */
+validate.changePasswordRules = () => {
+  return [
+    // Current password validation
+    body("current_password")
+      .trim()
+      .notEmpty()
+      .withMessage("Current password is required."),
+      
+    // New password validation
+    body("new_password")
+      .trim()
+      .notEmpty()
+      .withMessage("New password is required.")
+      .isLength({ min: 12, max: 100 })
+      .withMessage("Password must be between 12-100 characters.")
+      .matches(PASSWORD_PATTERN)
+      .withMessage(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+      )
+      .custom((value, { req }) => {
+        if (value === req.body.current_password) {
+          throw new Error("New password must be different from current password.");
+        }
+        return true;
+      }),
+      
+    // Confirm new password validation
+    body("confirm_password")
+      .trim()
+      .notEmpty()
+      .withMessage("Please confirm your new password.")
+      .custom((value, { req }) => {
+        if (value !== req.body.new_password) {
+          throw new Error("New passwords do not match.");
+        }
+        return true;
+      })
+  ];
+};
+
+/* ******************************
+ * Middleware to check validation results
+ * ***************************** */
+validate.checkValidation = (req, res, next) => {
+  const errors = validationResult(req);
+  
+  if (!errors.isEmpty()) {
+    // Format errors for flash messages
+    const errorMessages = errors.array().map(error => error.msg);
+    req.flash('error', errorMessages[0]); // Show first error message
+    
+    // Store form data in session for sticky form
+    req.session.formData = req.body;
+    
+    // Redirect back to the form with error message
+    return res.redirect('back');
+  }
+  
+  // Clear any previous form data from session
+  if (req.session.formData) {
+    delete req.session.formData;
+  }
+  
+  next();
+};
+
+/* ******************************
+ * Check if user is authenticated
+ * ***************************** */
+validate.isAuthenticated = (req, res, next) => {
+  if (req.session && req.session.user && req.session.loggedin) {
+    return next();
+  }
+  
+  req.flash('notice', 'Please log in to access this page.');
+  req.session.returnTo = req.originalUrl;
+  res.redirect('/account/login');
+};
+
+/* ******************************
+ * Check if user has required role
+ * ***************************** */
+validate.hasRole = (roles = []) => {
+  return (req, res, next) => {
+    if (!req.session || !req.session.user || !req.session.loggedin) {
+      req.flash('notice', 'Please log in to access this page.');
+      req.session.returnTo = req.originalUrl;
+      return res.redirect('/account/login');
+    }
+    
+    // If roles is a string, convert it to an array
+    if (typeof roles === 'string') {
+      roles = [roles];
+    }
+    
+    // Check if user has any of the required roles
+    if (roles.length && !roles.includes(req.session.user.account_type)) {
+      req.flash('notice', 'You do not have permission to access this page.');
+      return res.redirect('/account/');
+    }
+    
+    next();
+  };
+};
+
+/* ******************************
+ * Check if user is account owner or admin
+ * ***************************** */
+validate.isAccountOwnerOrAdmin = (req, res, next) => {
+  if (!req.session || !req.session.user || !req.session.loggedin) {
+    req.flash('notice', 'Please log in to access this page.');
+    req.session.returnTo = req.originalUrl;
+    return res.redirect('/account/login');
+  }
+  
+  const accountId = req.params.accountId || req.body.account_id;
+  
+  // Allow if user is admin or the account owner
+  if (req.session.user.account_type === 'Admin' || req.session.user.account_id.toString() === accountId.toString()) {
+    return next();
+  }
+  
+  req.flash('notice', 'You do not have permission to perform this action.');
+  res.redirect('/account/');
 };
 
 /* ******************************

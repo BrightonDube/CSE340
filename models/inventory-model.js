@@ -22,6 +22,24 @@ async function getInventoryByClassificationId(classification_id) {
     return data.rows
   } catch (error) {
     console.error("getclassificationsbyid error " + error)
+    return error.message
+  }
+}
+
+/* ***************************
+ * Get inventory by model (case-insensitive search)
+ * ************************** */
+async function getInventoryByModel(model) {
+  try {
+    const data = await pool.query(
+      `SELECT * FROM public.inventory 
+      WHERE LOWER(inv_model) = LOWER($1)`,
+      [model]
+    )
+    return data
+  } catch (error) {
+    console.error("getInventoryByModel error " + error)
+    return error.message
   }
 }
 
@@ -38,9 +56,10 @@ async function getInventoryById(inv_id) {
        WHERE i.inv_id = $1`,
       [inv_id]
     );
-    return data.rows[0];
+    return data.rows;
   } catch (error) {
     console.error("getInventoryById error " + error);
+    return [];
   }
 }
 
@@ -112,6 +131,7 @@ async function addInventory({
 module.exports = {
   getClassifications, 
   getInventoryByClassificationId, 
+  getInventoryByModel,
   getInventoryById,
   addClassification,
   addInventory

@@ -5,7 +5,7 @@
   
   <% if (message) { %>
     <div class="alert alert-<%= message.type || 'info' %>">
-      <%= message.text %>
+      <%- message.text %>
     </div>
   <% } %>
   
@@ -20,10 +20,10 @@
   <% } %>
   
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-lg-6">
       <div class="card">
         <div class="card-body">
-          <form action="/inv/add-classification" method="post">
+          <form action="/inv/add-classification" method="post" id="classificationForm">
             <div class="mb-3">
               <label for="classification_name" class="form-label">Classification Name</label>
               <input 
@@ -32,15 +32,17 @@
                 id="classification_name" 
                 name="classification_name" 
                 required
-                pattern="^[a-zA-Z0-9]+"
-                title="No spaces or special characters allowed"
                 value="<%= classification_name || '' %>"
+                pattern="^[a-zA-Z0-9]+$"
+                title="Classification name must not contain spaces or special characters"
               >
-              <div class="form-text">No spaces or special characters allowed</div>
+              <div class="form-text">Enter a name for the new classification (no spaces or special characters).</div>
+              <div class="invalid-feedback">
+                Please provide a valid classification name with no spaces or special characters.
+              </div>
             </div>
-            
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">Add Classification</button>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button type="submit" class="btn btn-primary me-md-2">Add Classification</button>
               <a href="/inv" class="btn btn-secondary">Cancel</a>
             </div>
           </form>
@@ -51,3 +53,29 @@
 </main>
 
 <%- include('../../views/partials/footer') %>
+
+<script>
+document.getElementById('classificationForm').addEventListener('submit', function(event) {
+  const classificationInput = document.getElementById('classification_name');
+  const regex = /^[a-zA-Z0-9]+$/;
+  
+  if (!regex.test(classificationInput.value)) {
+    event.preventDefault();
+    classificationInput.classList.add('is-invalid');
+    classificationInput.focus();
+    return false;
+  }
+  
+  return true;
+});
+
+// Remove invalid class when user starts typing
+const classificationInput = document.getElementById('classification_name');
+if (classificationInput) {
+  classificationInput.addEventListener('input', function() {
+    if (this.classList.contains('is-invalid')) {
+      this.classList.remove('is-invalid');
+    }
+  });
+}
+</script>

@@ -1,14 +1,10 @@
 // Needed Resources 
 const express = require("express");
 const router = new express.Router();
+const passport = require('passport');
 const utilities = require("../utilities/");
 const accountController = require("../controllers/accountController");
 const validate = require('../utilities/account-validation');
-
-
-// =====================================
-// Authentication Routes
-// =====================================
 
 // Route to build login view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
@@ -18,46 +14,56 @@ router.post(
   "/login",
   validate.loginRules(),
   validate.checkValidation,
-  utilities.handleErrors(accountController.processLogin)
+  passport.authenticate('local', {
+    failureFlash: true,
+    failureRedirect: '/account/login',
+    failureMessage: true
+  }),
+  async (req, res) => {
+    // Set success flash message
+    req.flash('success', `Welcome back, ${req.user.account_firstname}!`);
+    
+    // Redirect to the original URL or home page
+    const redirectUrl = req.session.returnTo || '/';
+    delete req.session.returnTo;
+    res.redirect(redirectUrl);
+  }
 );
 
 // Logout route
-router.get('/logout', utilities.handleErrors(accountController.logout));
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      req.flash('error', 'Error logging out. Please try again.');
+      return res.redirect('/account/');
+    }
+    req.flash('success', 'You have been successfully logged out.');
+    res.redirect('/');
+  });
+});
 
-// =====================================
-// Registration Routes
-// =====================================
+// Registration routes
+router.get('/register', utilities.handleErrors(accountController.buildRegister));
 
-// Route to build registration view
-router.get("/register", utilities.handleErrors(accountController.buildRegister));
-
-// Process registration
 router.post(
-  "/register",
+  '/register',
   validate.registrationRules(),
   validate.checkValidation,
   utilities.handleErrors(accountController.registerAccount)
 );
 
-// =====================================
-// Authenticated Routes (require login)
-// =====================================
+// Account management routes (require authentication)
 router.use(validate.isAuthenticated);
 
-// Account management view
-router.get(
-  "/",
-  utilities.handleErrors(accountController.accountManagement)
-);
+// View account details
+router.get('/', utilities.handleErrors(accountController.accountManagement));
 
-// Update account details view
-router.get(
-  '/update/:accountId', 
+// Update account details
+router.get('/update/:accountId', 
   validate.isAccountOwnerOrAdmin,
   utilities.handleErrors(accountController.buildUpdateAccount)
 );
 
-// Process account update
 router.post(
   '/update-account',
   validate.updateProfileRules(),
@@ -66,13 +72,9 @@ router.post(
   utilities.handleErrors(accountController.updateAccount)
 );
 
-// Change password view
-router.get(
-  '/change-password', 
-  utilities.handleErrors(accountController.buildChangePassword)
-);
+// Change password
+router.get('/change-password', utilities.handleErrors(accountController.buildChangePassword));
 
-// Process password change
 router.post(
   '/change-password',
   validate.changePasswordRules(),
@@ -109,5 +111,3 @@ router.use((err, req, res, next) => {
 });
 
 module.exports = router;
-      
-

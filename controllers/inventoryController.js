@@ -3,7 +3,6 @@
  * **************************************** */
 const utilities = require("../utilities/");
 const invModel = require("../models/inventory-model");
-const { uploadFiles, handleUploadErrors } = require("../utilities/file-upload");
 
 /* ***************************
  * Build inventory by classification view
@@ -25,76 +24,106 @@ async function buildByClassificationId(req, res, next) {
  * Build inventory detail view
  * ************************** */
 async function buildByInventoryId(req, res, next) {
-  const inv_id = req.params.inventoryId;
-  const data = await invModel.getInventoryById(inv_id);
-  const grid = await utilities.buildInventoryDetail(data);
-  let nav = await utilities.getNav();
-  const name = data[0].inv_make + " " + data[0].inv_model;
-  res.render("./inventory/detail", {
-    title: name,
-    nav,
-    grid,
-  });
+  try {
+    const inv_id = req.params.inv_id;
+    const data = await invModel.getInventoryById(inv_id);
+    
+    // Check if data exists and has at least one item
+    if (!data || !data.length) {
+      req.flash('notice', 'Sorry, that inventory item does not exist.');
+      return res.redirect('/inv');
+    }
+    
+    // If we get here, we have data
+    const grid = utilities.buildVehicleDetail(data[0]);
+    let nav = await utilities.getNav();
+    const name = data[0].inv_make + " " + data[0].inv_model;
+    
+    res.render("./inventory/detail", {
+      title: name,
+      nav,
+      grid,
+      message: req.flash('notice')
+    });
+  } catch (error) {
+    console.error('Error in buildByInventoryId:', error);
+    error.status = 500;
+    error.message = 'Error building inventory detail view';
+    next(error);
+  }
 }
 
 /* ***************************
  * Build management view
  * ************************** */
 async function buildManagementView(req, res, next) {
-  let nav = await utilities.getNav();
-  res.render("./inventory/management", {
-    title: "Inventory Management",
-    nav,
-    message: req.flash('notice'),
-  });
+  try {
+    let nav = await utilities.getNav();
+    res.render("./inventory/management", {
+      title: "Vehicle Management",
+      nav,
+      message: req.flash('notice'),
+      errors: null,
+      classification_name: ''
+    });
+  } catch (error) {
+    error.status = 500;
+    error.message = 'Error building management view';
+    next(error);
+  }
 }
 
 /* ***************************
  * Build add classification view
  * ************************** */
 async function buildAddClassification(req, res, next) {
-  let nav = await utilities.getNav();
-  res.render("./inventory/add-classification", {
-    title: "Add New Classification",
-    nav,
-    errors: null,
-    classification_name: '',
-    message: req.flash('notice')
-  });
+  try {
+    let nav = await utilities.getNav();
+    res.render("./inventory/add-classification", {
+      title: "Add New Classification",
+      nav,
+      errors: null,
+      classification_name: '',
+      message: req.flash('notice')
+    });
+  } catch (error) {
+    error.status = 500;
+    error.message = 'Error building add classification view';
+    next(error);
+  }
 }
 
 /* ***************************
  * Add new classification
  * ************************** */
-async function addClassification(req, res) {
-  let nav = await utilities.getNav();
+async function addClassification(req, res, next) {
   const { classification_name } = req.body;
   
   try {
+    // Check if classification already exists
+    const classifications = await invModel.getClassifications();
+    const exists = classifications.rows.some(
+      (c) => c.classification_name.toLowerCase() === classification_name.toLowerCase()
+    );
+    
+    if (exists) {
+      req.flash('notice', `Classification "${classification_name}" already exists.`);
+      return res.redirect('/inv/add-classification');
+    }
+    
     const result = await invModel.addClassification(classification_name);
+    
     if (result) {
-      req.flash("notice", `Successfully added ${classification_name} classification.`);
-      res.redirect("/inv");
+      req.flash('notice', `Successfully added "${classification_name}" classification.`);
+      res.redirect('/inv');
     } else {
-      req.flash("notice", "Sorry, the classification could not be added.");
-      res.status(500).render("inventory/add-classification", {
-        title: "Add New Classification",
-        nav,
-        errors: null,
-        classification_name,
-        message: { type: 'danger', text: 'Sorry, the classification could not be added.' }
-      });
+      req.flash('notice', 'Sorry, the classification could not be added.');
+      res.redirect('/inv/add-classification');
     }
   } catch (error) {
-    console.error("Error adding classification:", error);
-    req.flash("notice", "Sorry, there was an error adding the classification.");
-    res.status(500).render("inventory/add-classification", {
-      title: "Add New Classification",
-      nav,
-      errors: null,
-      classification_name,
-      message: { type: 'danger', text: 'Sorry, there was an error adding the classification.' }
-    });
+    error.status = 500;
+    error.message = 'Error adding classification';
+    next(error);
   }
 }
 
@@ -111,9 +140,10 @@ async function buildAddInventory(req, res, next) {
       nav,
       classificationList,
       errors: null,
+      classification_id: '',
       inv_make: '',
       inv_model: '',
-      inv_year: '',
+      inv_year: new Date().getFullYear(),
       inv_description: '',
       inv_image: '/images/vehicles/no-image.png',
       inv_thumbnail: '/images/vehicles/no-image-tn.png',
@@ -123,100 +153,68 @@ async function buildAddInventory(req, res, next) {
       message: req.flash('notice')
     });
   } catch (error) {
-    console.error("Error building add inventory view:", error);
-    req.flash("notice", "Sorry, there was an error loading the add inventory page.");
-    res.redirect("/inv");
+    error.status = 500;
+    error.message = 'Error building add inventory view';
+    next(error);
   }
 }
 
 /* ***************************
- * Process file uploads for inventory
- * ************************** */
-const processFileUploads = (req, res, next) => {
-  uploadFiles(req, res, (err) => {
-    if (err) {
-      return handleUploadErrors(err, req, res, next);
-    }
-    next();
-  });
-};
-
-/* ***************************
  * Add new inventory
  * ************************** */
-async function addInventory(req, res) {
-  let nav = await utilities.getNav();
-  const classificationList = await utilities.buildClassificationList(req.body.classification_id);
-  
-  // Handle file uploads if files were uploaded
-  let inv_image = req.body.inv_image || '/images/vehicles/no-image.png';
-  let inv_thumbnail = req.body.inv_thumbnail || '/images/vehicles/no-image-tn.png';
-  
-  if (req.files) {
-    if (req.files.inv_image && req.files.inv_image[0]) {
-      // Convert path to URL path
-      inv_image = '/images/vehicles/' + path.basename(req.files.inv_image[0].path);
-    }
-    if (req.files.inv_thumbnail && req.files.inv_thumbnail[0]) {
-      // Convert path to URL path
-      inv_thumbnail = '/images/vehicles/' + path.basename(req.files.inv_thumbnail[0].path);
-    }
-  }
-  
+async function addInventory(req, res, next) {
   const {
     classification_id,
     inv_make,
     inv_model,
     inv_year,
     inv_description,
+    inv_image,
+    inv_thumbnail,
     inv_price,
     inv_miles,
     inv_color
   } = req.body;
   
   try {
+    // Check if vehicle already exists
+    const inventory = await invModel.getInventoryByModel(inv_model);
+    const exists = inventory.rows.some(
+      (item) => 
+        item.inv_make.toLowerCase() === inv_make.toLowerCase() &&
+        item.inv_model.toLowerCase() === inv_model.toLowerCase() &&
+        item.inv_year === parseInt(inv_year)
+    );
+    
+    if (exists) {
+      req.flash('notice', `A ${inv_year} ${inv_make} ${inv_model} already exists in inventory.`);
+      return res.redirect('/inv/add-inventory');
+    }
+    
     const result = await invModel.addInventory({
-      classification_id,
+      classification_id: parseInt(classification_id),
       inv_make,
       inv_model,
-      inv_year,
+      inv_year: parseInt(inv_year),
       inv_description,
-      inv_image,
-      inv_thumbnail,
-      inv_price,
-      inv_miles,
+      inv_image: inv_image || '/images/vehicles/no-image.png',
+      inv_thumbnail: inv_thumbnail || '/images/vehicles/no-image-tn.png',
+      inv_price: parseFloat(inv_price),
+      inv_miles: parseInt(inv_miles),
       inv_color
     });
     
     if (result) {
-      req.flash("notice", `Successfully added ${inv_year} ${inv_make} ${inv_model} to inventory.`);
-      return res.redirect("/inv");
+      req.flash('notice', `Successfully added ${inv_year} ${inv_make} ${inv_model} to inventory.`);
+      res.redirect('/inv');
     } else {
-      req.flash("notice", "Sorry, the vehicle could not be added to inventory.");
-      return res.status(500).render("inventory/add-inventory", {
-        title: "Add New Vehicle",
-        nav,
-        classificationList,
-        errors: null,
-        ...req.body,
-        inv_image,
-        inv_thumbnail,
-        message: { type: 'danger', text: 'Sorry, the vehicle could not be added to inventory.' }
-      });
+      req.flash('notice', 'Sorry, the vehicle could not be added to inventory.');
+      res.redirect('/inv/add-inventory');
     }
   } catch (error) {
-    console.error("Error adding inventory:", error);
-    req.flash("notice", "Sorry, there was an error adding the vehicle to inventory.");
-    return res.status(500).render("inventory/add-inventory", {
-      title: "Add New Vehicle",
-      nav,
-      classificationList,
-      errors: null,
-      ...req.body,
-      inv_image,
-      inv_thumbnail,
-      message: { type: 'danger', text: 'Sorry, there was an error adding the vehicle to inventory.' }
-    });
+    error.status = 500;
+    error.message = 'Error adding inventory item';
+    next(error);
   }
 }
 
@@ -227,7 +225,5 @@ module.exports = {
   buildAddClassification,
   addClassification,
   buildAddInventory,
-  addInventory,
-  processFileUploads,
-  handleUploadErrors
+  addInventory
 };
