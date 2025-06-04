@@ -13,12 +13,12 @@ const validate = require('../utilities/account-validation');
 // Route to build login view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
 
-// Process login attempt
+// Process the login request
 router.post(
   "/login",
   validate.loginRules(),
-  validate.checkValidation,
-  utilities.handleErrors(accountController.processLogin)
+  validate.checkLoginData,
+  utilities.handleErrors(accountController.accountLogin)
 );
 
 // Logout route

@@ -19,7 +19,7 @@ const accountRoute = require('./routes/accountRoute');
 const session = require('express-session');
 const pool = require('./database/');
 const { notFound, errorHandler, validationErrorHandler, databaseErrorHandler } = require('./utilities/error-handler');
-
+const cookieParser = require("cookie-parser")
 
 /* ***********************
  * Middleware
@@ -46,6 +46,9 @@ app.use(
     }
   })
 );
+
+// Cookie parser middleware
+app.use(cookieParser());
 
 // Express Messages Middleware
 const flash = require('connect-flash');
