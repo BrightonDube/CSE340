@@ -1,0 +1,177 @@
+<%- include('../../views/partials/header', { title: title }) %>
+
+<main class="container">
+  <h1>Edit Vehicle</h1>
+  
+  <% if (message) { %>
+    <div class="alert alert-<%= message.type || 'info' %>">
+      <%- message.text %>
+    </div>
+  <% } %>
+  
+  <div class="form-container">
+    <form action="/inv/update/" method="post" id="editInventoryForm">
+      <input type="hidden" name="inv_id" value="<%= inv_id %>">
+      
+      <div class="form-group">
+        <label for="classification_id">Classification</label>
+        <%- classificationList.replace(`value="${classification_id}"`, `value="${classification_id}" selected`) %>
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_make">Make</label>
+        <input type="text" id="inv_make" name="inv_make" class="form-control" required 
+               value="<%= inv_make %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_model">Model</label>
+        <input type="text" id="inv_model" name="inv_model" class="form-control" required 
+               value="<%= inv_model %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_year">Year</label>
+        <input type="number" id="inv_year" name="inv_year" class="form-control" required 
+               min="1900" max="<%= new Date().getFullYear() + 1 %>" value="<%= inv_year %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_description">Description</label>
+        <textarea id="inv_description" name="inv_description" class="form-control" 
+                  rows="4" required><%= inv_description %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_image">Image Path</label>
+        <input type="text" id="inv_image" name="inv_image" class="form-control" 
+               value="<%= inv_image %>" placeholder="/images/vehicles/...">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_thumbnail">Thumbnail Path</label>
+        <input type="text" id="inv_thumbnail" name="inv_thumbnail" class="form-control" 
+               value="<%= inv_thumbnail %>" placeholder="/images/vehicles/...">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_price">Price</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">$</span>
+          </div>
+          <input type="number" id="inv_price" name="inv_price" class="form-control" 
+                 step="0.01" min="0" required value="<%= inv_price %>">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_miles">Miles</label>
+        <input type="number" id="inv_miles" name="inv_miles" class="form-control" 
+               min="0" required value="<%= inv_miles %>">
+      </div>
+      
+      <div class="form-group">
+        <label for="inv_color">Color</label>
+        <input type="text" id="inv_color" name="inv_color" class="form-control" 
+               required value="<%= inv_color %>">
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Update Vehicle</button>
+        <a href="/inv/" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('../../views/partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Form validation
+  const form = document.getElementById('editInventoryForm');
+  
+  form.addEventListener('submit', function(event) {
+    // Client-side validation can be added here if needed
+    // For now, we'll let the server handle validation
+  });
+});
+</script>
+
+<style>
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+textarea.form-control {
+  min-height: 120px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #0066cc;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+</style>

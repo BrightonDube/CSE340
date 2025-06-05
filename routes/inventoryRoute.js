@@ -49,4 +49,35 @@ router.post("/add-inventory",
 // Intentional error route for testing error handler
 router.get("/error500", Util.handleErrors(invController.throwError));
 
+// Route to get inventory by classification as JSON
+router.get("/getInventory/classification_id/:classification_id", 
+  Util.handleErrors(invController.getInventoryJSON)
+);
+
+// Route to build edit inventory view
+router.get("/edit/inv_id/:inv_id",
+  isAuthenticated,
+  Util.handleErrors(invController.buildEditInventory)
+);
+
+// Route to process update inventory
+router.post("/update/",
+  isAuthenticated,
+  validate.updateRules(),
+  validate.checkUpdateData,
+  Util.handleErrors(invController.updateInventory)
+);
+
+// Route to build delete confirmation view
+router.get("/delete/inv_id/:inv_id",
+  isAuthenticated,
+  Util.handleErrors(invController.buildDeleteInventory)
+);
+
+// Route to process inventory deletion
+router.post("/delete/",
+  isAuthenticated,
+  Util.handleErrors(invController.deleteInventory)
+);
+
 module.exports = router;

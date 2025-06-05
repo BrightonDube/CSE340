@@ -4,6 +4,21 @@ const Util = require('.');
 const validate = {};
 
 /*  **********************************
+ *  Update Inventory Validation Rules
+ * ********************************* */
+validate.updateRules = () => {
+  return [
+    // inv_id is required for updates
+    body('inv_id')
+      .notEmpty()
+      .withMessage('Inventory ID is required.')
+      .isNumeric()
+      .withMessage('Invalid inventory ID.'),
+    ...validate.inventoryRules()
+  ];
+};
+
+/*  **********************************
  *  Classification Data Validation Rules
  * ********************************* */
 validate.classificationRules = () => {
@@ -114,23 +129,59 @@ validate.checkClassificationData = async (req, res, next) => {
  * Check data and return errors or continue to inventory creation
  * ***************************** */
 validate.checkInventoryData = async (req, res, next) => {
-  const errors = validationResult(req);
+  const { classification_id, inv_make, inv_model, inv_year, inv_description, inv_price, inv_miles, inv_color } = req.body;
+  let errors = [];
+  errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    let nav = await Util.getNav();
+    let select = await Util.buildClassificationList();
+    res.render("inventory/add-inventory", {
+      errors: errors.array(),
+      title: "Add New Vehicle",
+      nav,
+      classificationList: select,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id
+    });
+    return;
+  }
+  next();
+};
+
+/* ******************************
+ * Check data and return errors or continue to inventory update
+ * ***************************** */
+validate.checkUpdateData = async (req, res, next) => {
+  const { inv_id, classification_id, inv_make, inv_model, inv_year, inv_description, inv_price, inv_miles, inv_color } = req.body;
+  let errors = [];
+  errors = validationResult(req);
   
   if (!errors.isEmpty()) {
-    let nav = await utilities.getNav();
-    const classificationList = await Util.buildClassificationList(req.body.classification_id);
+    let nav = await Util.getNav();
+    let select = await Util.buildClassificationList();
     
-    return res.render('inventory/add-inventory', {
-      title: 'Add New Vehicle',
-      nav,
-      classificationList,
+    res.render("inventory/edit-inventory", {
       errors: errors.array(),
-      ...req.body,
-      message: {
-        type: 'danger',
-        text: 'Please correct the following errors:'
-      }
+      title: "Edit Vehicle",
+      nav,
+      classificationList: select,
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id
     });
+    return;
   }
   next();
 };

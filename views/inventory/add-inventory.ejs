@@ -264,9 +264,15 @@
   <h1 class="page-title">Add New Inventory Item</h1>
   
   <% if (message) { %>
-    <div class="alert alert-<%= message.type || 'info' %>">
-      <%- message.text %>
-    </div>
+    <% if (typeof message === 'string') { %>
+      <div class="alert alert-info">
+        <%- message %>
+      </div>
+    <% } else if (message.text) { %>
+      <div class="alert alert-<%= message.type || 'info' %>">
+        <%- message.text %>
+      </div>
+    <% } %>
   <% } %>
   
   <% if (errors && errors.length > 0) { %>
@@ -457,8 +463,6 @@
     </div>
   </div>
 </main>
-
-<%- include('../../views/partials/footer') %>
 
 <script>
 // Form validation
