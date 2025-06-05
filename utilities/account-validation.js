@@ -1,6 +1,8 @@
-const utilities = require(".");
+const Util = require(".");
 const { body, validationResult, checkSchema } = require("express-validator");
 const accountModel = require("../models/account-model");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const validate = {};
 
 // Common validation patterns
@@ -230,6 +232,26 @@ validate.checkValidation = (req, res, next) => {
  * Check if user is authenticated
  * ***************************** */
 validate.isAuthenticated = (req, res, next) => {
+  // Check JWT token first
+  if (req.cookies && req.cookies.jwt) {
+    return jwt.verify(
+      req.cookies.jwt,
+      process.env.ACCESS_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err) {
+          res.clearCookie('jwt');
+          req.flash('notice', 'Your session has expired. Please log in again.');
+          return res.redirect('/account/login');
+        }
+        req.user = decoded;
+        res.locals.accountData = decoded;
+        res.locals.loggedin = 1;
+        return next();
+      }
+    );
+  }
+  
+  // Fall back to session if no JWT
   if (req.session && req.session.user && req.session.loggedin) {
     return next();
   }
@@ -295,7 +317,7 @@ validate.checkRegData = async (req, res, next) => {
   errors = validationResult(req);
   
   if (!errors.isEmpty()) {
-    let nav = await utilities.getNav();
+    let nav = await Util.getNav();
     return res.render("account/register", {
       errors,
       title: "Registration",

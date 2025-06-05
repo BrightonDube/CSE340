@@ -13,7 +13,7 @@ const app = express();
 const static = require('./routes/static');
 const expressLayouts = require('express-ejs-layouts');
 const baseController = require('./controllers/baseController');
-const utilities = require('./utilities');
+const Util = require('./utilities');
 const inventoryRoute = require('./routes/inventoryRoute');
 const accountRoute = require('./routes/accountRoute');
 const session = require('express-session');
@@ -49,6 +49,9 @@ app.use(
 
 // Cookie parser middleware
 app.use(cookieParser());
+
+// JWT Token Validation
+app.use(Util.checkJWTToken);
 
 // Express Messages Middleware
 const flash = require('connect-flash');

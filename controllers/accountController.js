@@ -339,6 +339,14 @@ async function changePassword(req, res) {
 *  Process logout
 * *************************************** */
 async function logout(req, res) {
+  // Clear JWT cookie
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/'
+  });
+
   // Clear session data
   req.session.destroy((err) => {
     if (err) {
@@ -346,7 +354,12 @@ async function logout(req, res) {
       req.flash('error', 'Error logging out. Please try again.');
       return res.redirect('/account/');
     }
-    res.clearCookie('sessionId');
+    res.clearCookie('sessionId', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
     res.redirect('/');
   });
 }
@@ -357,31 +370,56 @@ async function logout(req, res) {
 async function accountLogin(req, res) {
   let nav = await utilities.getNav()
   const { account_email, account_password } = req.body
-  const accountData = await accountModel.getAccountByEmail(account_email)
-  if (!accountData) {
-    req.flash("notice", "Please check your credentials and try again.")
-    res.status(400).render("account/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-    })
-    return
-  }
+  
   try {
-    if (await bcrypt.compare(account_password, accountData.account_password)) {
-      delete accountData.account_password
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
-      if(process.env.NODE_ENV === 'development') {
-        res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
-      } else {
-        res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
-      }
-      return res.redirect("/account/")
+    const accountData = await accountModel.getAccountByEmail(account_email)
+    if (!accountData) {
+      req.flash("notice", "Please check your credentials and try again.")
+      return res.status(400).render("account/login", {
+        title: "Login",
+        nav,
+        errors: null,
+        account_email,
+      })
     }
-    else {
-      req.flash("message notice", "Please check your credentials and try again.")
-      res.status(400).render("account/login", {
+
+    if (await bcrypt.compare(account_password, accountData.account_password)) {
+      // Prepare user data for session and JWT
+      const userData = {
+        account_id: accountData.account_id,
+        account_firstname: accountData.account_firstname,
+        account_lastname: accountData.account_lastname,
+        account_email: accountData.account_email,
+        account_type: accountData.account_type
+      };
+
+      // Set JWT token
+      const accessToken = jwt.sign(
+        userData,
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      // Set JWT cookie
+      const cookieOptions = {
+        httpOnly: true,
+        maxAge: 3600 * 1000, // 1 hour
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      };
+      res.cookie('jwt', accessToken, cookieOptions);
+
+      // Set session data
+      req.session.user = userData;
+      req.session.loggedin = true;
+      
+      // Save session before redirect
+      return req.session.save(() => {
+        res.redirect(req.session.returnTo || '/account/');
+      });
+    } else {
+      req.flash("notice", "Please check your credentials and try again.")
+      return res.status(400).render("account/login", {
         title: "Login",
         nav,
         errors: null,
@@ -389,7 +427,14 @@ async function accountLogin(req, res) {
       })
     }
   } catch (error) {
-    throw new Error('Access Forbidden')
+    console.error('Login error:', error);
+    req.flash("notice", "An error occurred during login. Please try again.")
+    return res.status(500).render("account/login", {
+      title: "Login",
+      nav,
+      errors: null,
+      account_email,
+    })
   }
 }
 

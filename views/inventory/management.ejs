@@ -16,7 +16,23 @@
       <div class="management-actions">
         <a href="/inv/add-classification" class="btn btn-primary">Add New Classification</a>
         <a href="/inv/add-inventory" class="btn btn-primary">Add New Inventory</a>
+        <h2>Manage Inventory</h2>
+        <p>Select a classification from the list to view the inventory items.</p>
+        
+        <% if (classificationSelect) { %>
+          <%- classificationSelect %>
+        <% } %>
+        
+        <table id="inventoryDisplay" class="table table-striped">
+          <!-- Inventory items will be dynamically inserted here by JavaScript -->
+        </table>
+        
+        <noscript>
+          <p class="alert alert-warning">JavaScript must be enabled to use this page.</p>
+        </noscript>
       </div>
+      
+      <script src="/js/inventory.js" defer></script>
     </div>
   </div>
 </main>

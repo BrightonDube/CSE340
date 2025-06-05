@@ -123,4 +123,18 @@ Util.checkJWTToken = (req, res, next) => {
  }
 }
 
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+Util.checkLogin = (req, res, next) => {
+  // Check if user is logged in via JWT or session
+  if (res.locals.loggedin || (req.session && req.session.user && req.session.loggedin)) {
+    next();
+  } else {
+    req.flash("notice", "Please log in to access this page.");
+    req.session.returnTo = req.originalUrl;
+    return res.redirect("/account/login");
+  }
+}
+
 module.exports = Util

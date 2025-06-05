@@ -1,7 +1,7 @@
 // Needed Resources 
 const express = require("express");
 const router = new express.Router();
-const utilities = require("../utilities/");
+const Util = require("../utilities/");
 const accountController = require("../controllers/accountController");
 const validate = require('../utilities/account-validation');
 
@@ -11,50 +11,49 @@ const validate = require('../utilities/account-validation');
 // =====================================
 
 // Route to build login view
-router.get("/login", utilities.handleErrors(accountController.buildLogin));
+router.get("/login", Util.handleErrors(accountController.buildLogin));
 
 // Process the login request
 router.post(
   "/login",
   validate.loginRules(),
-  validate.checkLoginData,
-  utilities.handleErrors(accountController.accountLogin)
+  validate.checkValidation,
+  Util.handleErrors(accountController.accountLogin)
 );
 
 // Logout route
-router.get('/logout', utilities.handleErrors(accountController.logout));
+router.get('/logout', Util.handleErrors(accountController.logout));
 
 // =====================================
 // Registration Routes
 // =====================================
 
 // Route to build registration view
-router.get("/register", utilities.handleErrors(accountController.buildRegister));
+router.get("/register", Util.handleErrors(accountController.buildRegister));
 
 // Process registration
 router.post(
   "/register",
   validate.registrationRules(),
   validate.checkValidation,
-  utilities.handleErrors(accountController.registerAccount)
+  Util.handleErrors(accountController.registerAccount)
 );
 
 // =====================================
-// Authenticated Routes (require login)
+// Account Management (requires authentication)
 // =====================================
-router.use(validate.isAuthenticated);
-
-// Account management view
 router.get(
   "/",
-  utilities.handleErrors(accountController.accountManagement)
+  //validate.isAuthenticated,
+  Util.checkLogin,
+  Util.handleErrors(accountController.accountManagement)
 );
 
 // Update account details view
 router.get(
   '/update/:accountId', 
   validate.isAccountOwnerOrAdmin,
-  utilities.handleErrors(accountController.buildUpdateAccount)
+  Util.handleErrors(accountController.buildUpdateAccount)
 );
 
 // Process account update
@@ -63,13 +62,13 @@ router.post(
   validate.updateProfileRules(),
   validate.checkValidation,
   validate.isAccountOwnerOrAdmin,
-  utilities.handleErrors(accountController.updateAccount)
+  Util.handleErrors(accountController.updateAccount)
 );
 
 // Change password view
 router.get(
   '/change-password', 
-  utilities.handleErrors(accountController.buildChangePassword)
+  Util.handleErrors(accountController.buildChangePassword)
 );
 
 // Process password change
@@ -77,28 +76,28 @@ router.post(
   '/change-password',
   validate.changePasswordRules(),
   validate.checkValidation,
-  utilities.handleErrors(accountController.changePassword)
+  Util.handleErrors(accountController.changePassword)
 );
 
 // Admin routes (require admin role)
 router.use('/admin', validate.hasRole('Admin'));
 
 // Admin dashboard
-router.get('/admin', utilities.handleErrors(accountController.adminDashboard));
+router.get('/admin', Util.handleErrors(accountController.adminDashboard));
 
 // View all accounts (admin only)
-router.get('/admin/accounts', utilities.handleErrors(accountController.getAllAccounts));
+router.get('/admin/accounts', Util.handleErrors(accountController.getAllAccounts));
 
 // Update account status (admin only)
 router.post(
   '/admin/update-account-status/:accountId',
-  utilities.handleErrors(accountController.updateAccountStatus)
+  Util.handleErrors(accountController.updateAccountStatus)
 );
 
 // Delete account (admin only)
 router.post(
   '/admin/delete-account/:accountId',
-  utilities.handleErrors(accountController.deleteAccount)
+  Util.handleErrors(accountController.deleteAccount)
 );
 
 // Error handling middleware
