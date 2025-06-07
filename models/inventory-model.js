@@ -187,12 +187,12 @@ async function updateInventory({
  * ************************** */
 async function deleteInventory(inv_id) {
   try {
-    const sql = 'DELETE FROM public.inventory WHERE inv_id = $1 RETURNING *';
-    const data = await pool.query(sql, [inv_id]);
-    return data.rowCount > 0; // Return true if a row was deleted
+    const sql = 'DELETE FROM public.inventory WHERE inv_id = $1';
+    const data = await pool.query(sql, [inv_id])
+    return data.rowCount; // Returns 1 if successful, 0 if not
   } catch (error) {
-    console.error("deleteInventory error " + error);
-    return false;
+    console.error("Delete Inventory Error: " + error);
+    throw new Error("Delete Inventory Error");
   }
 }
 

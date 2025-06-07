@@ -285,34 +285,44 @@ invCont.getInventoryJSON = async (req, res, next) => {
  * ***************************/
 invCont.buildEditInventory = async function (req, res, next) {
   try {
+    // Get inv_id from either route parameter format
     const inv_id = parseInt(req.params.inv_id);
-    const invData = await invModel.getInventoryById(inv_id);
-    const classificationList = await utilities.buildClassificationList(invData.classification_id);
-    const nav = await utilities.getNav();
     
-    if (!invData) {
+    if (isNaN(inv_id) || inv_id <= 0) {
+      req.flash('notice', 'Invalid vehicle ID.');
+      return res.redirect('/inv/');
+    }
+    
+    // Get the inventory item data
+    const invDataResult = await invModel.getInventoryById(inv_id);
+    
+    if (!invDataResult || invDataResult.length === 0) {
       req.flash('notice', 'Vehicle not found.');
       return res.redirect('/inv/');
     }
     
-    res.render("./inventory/edit-inventory", {
+    const invData = invDataResult[0];
+    
+    // Log the data for debugging
+    console.log('Inventory Data:', invData);
+    
+    const classificationList = await utilities.buildClassificationList(invData.classification_id);
+    const nav = await utilities.getNav();
+    
+    // Prepare the data for the view
+    const viewData = {
       title: `Edit ${invData.inv_make} ${invData.inv_model}`,
       nav,
       classificationList,
       errors: null,
       message: req.flash('notice') || '',
-      inv_id: invData.inv_id,
-      inv_make: invData.inv_make,
-      inv_model: invData.inv_model,
-      inv_year: invData.inv_year,
-      inv_description: invData.inv_description,
-      inv_image: invData.inv_image,
-      inv_thumbnail: invData.inv_thumbnail,
-      inv_price: invData.inv_price,
-      inv_miles: invData.inv_miles,
-      inv_color: invData.inv_color,
-      classification_id: invData.classification_id
-    });
+      styles: ['/css/forms.css'],
+      ...invData  // Spread all inventory data properties
+    };
+    
+    console.log('View Data:', viewData); // Debug log
+    
+    res.render("./inventory/edit-inventory", viewData);
   } catch (error) {
     error.status = 500;
     error.message = 'Error building edit inventory view';
@@ -372,25 +382,33 @@ invCont.updateInventory = async function (req, res, next) {
 invCont.buildDeleteInventory = async function (req, res, next) {
   try {
     const inv_id = parseInt(req.params.inv_id);
-    const invData = await invModel.getInventoryById(inv_id);
+    const invDataResult = await invModel.getInventoryById(inv_id);
     const nav = await utilities.getNav();
     
-    if (!invData) {
+    // Check if we got any results
+    if (!invDataResult || invDataResult.length === 0) {
       req.flash('notice', 'Vehicle not found.');
       return res.redirect('/inv/');
     }
     
-    res.render("./inventory/delete-confirm", {
+    // Get the first (and should be only) result
+    const invData = invDataResult[0];
+    
+    // Prepare the data for the view
+    const viewData = {
       title: `Delete ${invData.inv_make} ${invData.inv_model}`,
       nav,
       errors: null,
       message: req.flash('notice') || '',
+      styles: ['/css/forms.css'],
       inv_id: invData.inv_id,
       inv_make: invData.inv_make,
       inv_model: invData.inv_model,
       inv_year: invData.inv_year,
       inv_price: invData.inv_price
-    });
+    };
+    
+    res.render("./inventory/delete-confirm", viewData);
   } catch (error) {
     error.status = 500;
     error.message = 'Error building delete confirmation view';

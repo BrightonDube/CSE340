@@ -1,133 +1,88 @@
-<%- include('../../views/partials/header', { title: title }) %>
-
 <main class="container">
-  <h1>Delete Vehicle</h1>
-  
-  <% if (message) { %>
-    <div class="alert alert-<%= message.type || 'info' %>">
-      <%- message.text %>
+  <div class="form-container">
+    <div class="form-header">
+      <h1>Delete Vehicle</h1>
     </div>
-  <% } %>
-  
-  <div class="confirmation-container">
-    <div class="confirmation-card">
-      <h2>Confirm Deletion</h2>
-      <p>Are you sure you want to delete the following vehicle?</p>
+    
+    <div class="form-body">
+      <% if (message) { %>
+        <div class="alert alert-<%= message.type === 'error' ? 'danger' : 'info' %>">
+          <div class="alert-content">
+            <i class="<%= message.type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle' %>"></i>
+            <div>
+              <h4><%= message.type === 'error' ? 'Error' : 'Notice' %></h4>
+              <p><%- message.text %></p>
+            </div>
+          </div>
+        </div>
+      <% } %>
       
-      <div class="vehicle-details">
-        <p><strong>Year:</strong> <%= inv_year %></p>
-        <p><strong>Make:</strong> <%= inv_make %></p>
-        <p><strong>Model:</strong> <%= inv_model %></p>
-        <p><strong>Price:</strong> $<%= parseFloat(inv_price).toLocaleString('en-US', {minimumFractionDigits: 2}) %></p>
+      <div class="form-group">
+        <p class="warning-text">You are about to permanently delete the following vehicle from the inventory. This action cannot be undone.</p>
       </div>
       
-      <p class="warning"><strong>Warning:</strong> This action cannot be undone.</p>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input type="text" class="form-control" value="<%= inv_year %>" readonly>
+      </div>
       
-      <form action="/inv/delete/" method="post" class="confirmation-form">
+      <div class="form-group">
+        <label class="form-label">Make</label>
+        <input type="text" class="form-control" value="<%= inv_make %>" readonly>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <input type="text" class="form-control" value="<%= inv_model %>" readonly>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Price</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input type="text" class="form-control" 
+                 value="<%= parseFloat(inv_price).toLocaleString('en-US', {minimumFractionDigits: 2}) %>" readonly>
+        </div>
+      </div>
+      
+      <div class="alert alert-warning">
+        <div class="alert-content">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <h4>Warning: This action is permanent</h4>
+            <p>This will permanently delete the vehicle from the inventory. This action cannot be undone. Please confirm that you want to proceed with the deletion.</p>
+          </div>
+        </div>
+      </div>
+      
+      <form action="/inv/delete" method="post" class="form">
         <input type="hidden" name="inv_id" value="<%= inv_id %>">
         <input type="hidden" name="inv_make" value="<%= inv_make %>">
         <input type="hidden" name="inv_model" value="<%= inv_model %>">
         <input type="hidden" name="inv_year" value="<%= inv_year %>">
         
-        <div class="form-actions">
-          <button type="submit" class="btn btn-danger">Delete Vehicle</button>
-          <a href="/inv/" class="btn btn-secondary">Cancel</a>
+        <div class="form-footer">
+          <a href="/inv/" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-danger" id="deleteButton">
+            <i class="fas fa-trash-alt"></i> Delete Vehicle Permanently
+          </button>
         </div>
       </form>
     </div>
   </div>
 </main>
 
-<%- include('../../views/partials/footer') %>
-
-<style>
-.confirmation-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.confirmation-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  text-align: center;
-}
-
-.vehicle-details {
-  background: #f8f9fa;
-  border-left: 4px solid #0066cc;
-  padding: 1rem;
-  margin: 1.5rem 0;
-  text-align: left;
-}
-
-.vehicle-details p {
-  margin: 0.5rem 0;
-}
-
-.warning {
-  color: #dc3545;
-  font-weight: 600;
-  margin: 1.5rem 0;
-}
-
-.confirmation-form {
-  margin-top: 2rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.btn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  text-decoration: none;
-  text-align: center;
-  transition: background-color 0.2s;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
-.alert {
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 4px;
-}
-
-.alert-info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-.alert-error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-</style>
+<script>
+// Add loading state to the delete button
+document.addEventListener('DOMContentLoaded', function() {
+  const deleteButton = document.getElementById('deleteButton');
+  if (deleteButton) {
+    deleteButton.addEventListener('click', function() {
+      this.classList.add('loading');
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    });
+  }
+});
+</script>

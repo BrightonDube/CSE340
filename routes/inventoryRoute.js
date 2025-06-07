@@ -54,8 +54,8 @@ router.get("/getInventory/classification_id/:classification_id",
   Util.handleErrors(invController.getInventoryJSON)
 );
 
-// Route to build edit inventory view
-router.get("/edit/inv_id/:inv_id",
+// Route to build edit inventory view - handles both /edit/16 and /edit/inv_id/16
+router.get(["/edit/:inv_id", "/edit/inv_id/:inv_id"],
   isAuthenticated,
   Util.handleErrors(invController.buildEditInventory)
 );
@@ -69,7 +69,7 @@ router.post("/update/",
 );
 
 // Route to build delete confirmation view
-router.get("/delete/inv_id/:inv_id",
+router.get("/delete/:inv_id",
   isAuthenticated,
   Util.handleErrors(invController.buildDeleteInventory)
 );

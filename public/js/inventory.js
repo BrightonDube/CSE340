@@ -166,21 +166,3 @@ document.addEventListener('DOMContentLoaded', function() {
   
   console.log('Inventory management script loaded');
 });
-
-// Build inventory items into HTML table components and inject into DOM 
-function buildInventoryList(inventory) {
-  let inventoryDisplay = document.getElementById("inventoryDisplay");
-  let dataTable = '<thead>';
-  dataTable += '<tr><th>Vehicle Name</th><td>&nbsp;</td><td>&nbsp;</td></tr>';
-  dataTable += '</thead>';
-  dataTable += '<tbody>';
-  // Iterate over the inventory and populate each row
-  inventory.forEach(vehicle => {
-    dataTable += `<tr><td>${vehicle.inv_make} ${vehicle.inv_model} ${vehicle.inv_year}</td>`;
-    dataTable += `<td><a href="/inv/edit/inv_id/${vehicle.inv_id}" title="Click to update">Modify</a></td>`;
-    dataTable += `<td><a href="/inv/delete/inv_id/${vehicle.inv_id}" title="Click to delete">Delete</a></td></tr>`;
-  });
-  dataTable += '</tbody>';
-  // Display the table in the inventory display area
-  inventoryDisplay.innerHTML = dataTable;
-}
