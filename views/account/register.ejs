@@ -1,31 +1,53 @@
 <main class="container">
   <div class="form-container">
-    <h1 class="text-center"><%= title %></h1>
+    <h1 class="text-center"><%= typeof title !== 'undefined' ? title : 'Registration' %></h1>
     
-    <% if (locals.message) { %>
-      <div class="message <%= message.type || 'info' %>">
-        <%- message.text %>
-      </div>
+    <%# Display flash messages if they exist %>
+    <% if (typeof messages !== 'undefined') { %>
+      <% if (messages.error && Array.isArray(messages.error) && messages.error.length > 0) { %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% messages.error.forEach(message => { %>
+              <li><%= typeof message === 'string' ? message : JSON.stringify(message) %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+      
+      <% if (messages.success && Array.isArray(messages.success) && messages.success.length > 0) { %>
+        <div class="alert alert-success">
+          <ul class="mb-0">
+            <% messages.success.forEach(message => { %>
+              <li><%= message %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
     <% } %>
     
-    <% if (errors && errors.array().length > 0) { %>
-      <div class="message error">
-        <ul>
-          <% errors.array().forEach(error => { %>
-            <li><%= error.msg %></li>
+    <%# Display validation errors if they exist %>
+    <% if (errors && Array.isArray(errors) && errors.length > 0) { %>
+      <div class="alert alert-warning">
+        <h5>Please fix the following:</h5>
+        <ul class="mb-0">
+          <% errors.forEach(error => { %>
+            <li><%= error.msg || 'Validation error' %></li>
           <% }) %>
         </ul>
       </div>
     <% } %>
     
-    <form action="/account/register" method="post" class="registration-form">
+    <form action="/account/register" method="POST" class="registration-form" id="registerForm" enctype="application/x-www-form-urlencoded">
+      <% if (typeof _csrf !== 'undefined') { %>
+        <input type="hidden" name="_csrf" value="<%= _csrf %>">
+      <% } %>
       <div class="form-group">
         <label for="account_firstname">First Name</label>
         <input 
           type="text" 
           id="account_firstname" 
           name="account_firstname" 
-          value="<%= locals.account_firstname %>"
+          value="<%= typeof account_firstname !== 'undefined' ? account_firstname : (locals.account_firstname || '') %>"
           placeholder="Enter your first name" 
           required
           class="form-control"
@@ -39,7 +61,7 @@
           type="text" 
           id="account_lastname" 
           name="account_lastname" 
-          value="<%= locals.account_lastname %>"
+          value="<%= typeof account_lastname !== 'undefined' ? account_lastname : (locals.account_lastname || '') %>"
           placeholder="Enter your last name" 
           required
           class="form-control"
@@ -53,7 +75,7 @@
           type="email" 
           id="account_email" 
           name="account_email" 
-          value="<%= locals.account_email %>" 
+          value="<%= typeof account_email !== 'undefined' ? account_email : (locals.account_email || '') %>" 
           placeholder="Enter your email" 
           required
           class="form-control"

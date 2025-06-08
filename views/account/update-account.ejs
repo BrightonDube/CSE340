@@ -33,6 +33,7 @@
   <div class="form-body">
     <!-- Account Update Form -->
     <form id="accountUpdateForm" action="/account/update" method="post" class="mb-8">
+  <input type="hidden" name="_csrf" value="<%= _csrf %>">
       <input type="hidden" name="account_id" id="account_id" value="<%= accountData.account_id %>">
       
       <h2 class="text-xl font-semibold mb-4">Update Account Information</h2>
@@ -43,11 +44,11 @@
           type="text" 
           id="account_firstname" 
           name="account_firstname" 
-          class="form-control <%= locals.errors && errors.account_firstname ? 'is-invalid' : '' %>" 
+          class="form-control <%= errors && errors.account_firstname ? 'is-invalid' : '' %>" 
           value="<%= accountData.account_firstname || '' %>" 
           required
         >
-        <% if (locals.errors && errors.account_firstname) { %>
+        <% if (errors && errors.account_firstname) { %>
           <div class="invalid-feedback"><%= errors.account_firstname %></div>
         <% } %>
       </div>
@@ -58,11 +59,11 @@
           type="text" 
           id="account_lastname" 
           name="account_lastname" 
-          class="form-control <%= locals.errors && errors.account_lastname ? 'is-invalid' : '' %>" 
+          class="form-control <%= errors && errors.account_lastname ? 'is-invalid' : '' %>" 
           value="<%= accountData.account_lastname || '' %>" 
           required
         >
-        <% if (locals.errors && errors.account_lastname) { %>
+        <% if (errors && errors.account_lastname) { %>
           <div class="invalid-feedback"><%= errors.account_lastname %></div>
         <% } %>
       </div>
@@ -73,11 +74,11 @@
           type="email" 
           id="account_email" 
           name="account_email" 
-          class="form-control <%= locals.errors && errors.account_email ? 'is-invalid' : '' %>" 
+          class="form-control <%= errors && errors.account_email ? 'is-invalid' : '' %>" 
           value="<%= accountData.account_email || '' %>" 
           required
         >
-        <% if (locals.errors && errors.account_email) { %>
+        <% if (errors && errors.account_email) { %>
           <div class="invalid-feedback"><%= errors.account_email %></div>
         <% } %>
       </div>
@@ -90,6 +91,7 @@
 
     <!-- Change Password Form -->
     <form id="changePasswordForm" action="/account/change-password" method="post" class="mt-8">
+  <input type="hidden" name="_csrf" value="<%= _csrf %>">
       <input type="hidden" name="account_id" id="password_account_id" value="<%= accountData.account_id %>">
       
       <div class="form-section">

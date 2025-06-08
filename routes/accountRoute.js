@@ -34,8 +34,10 @@ router.get("/register", Util.handleErrors(accountController.buildRegister));
 // Process registration
 router.post(
   "/register",
+  // Validate input
   validate.registrationRules(),
   validate.checkValidation,
+  // Handle registration
   Util.handleErrors(accountController.registerAccount)
 );
 

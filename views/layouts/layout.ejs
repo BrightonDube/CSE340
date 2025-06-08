@@ -8,6 +8,39 @@
         <%- include('../partials/navigation') %>
 
           <main>
+            <%# Display flash messages if they exist %>
+            <% if (typeof messages !== 'undefined') { %>
+              <% if (messages.error && Array.isArray(messages.error) && messages.error.length > 0) { %>
+                <div class="alert alert-danger">
+                  <ul class="mb-0">
+                    <% messages.error.forEach(message => { %>
+                      <li><%= typeof message === 'string' ? message : JSON.stringify(message) %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+              
+              <% if (messages.success && Array.isArray(messages.success) && messages.success.length > 0) { %>
+                <div class="alert alert-success">
+                  <ul class="mb-0">
+                    <% messages.success.forEach(message => { %>
+                      <li><%= message %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+              
+              <% if (messages.info && Array.isArray(messages.info) && messages.info.length > 0) { %>
+                <div class="alert alert-info">
+                  <ul class="mb-0">
+                    <% messages.info.forEach(message => { %>
+                      <li><%= message %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+            <% } %>
+            
             <%- body %>
           </main>
 

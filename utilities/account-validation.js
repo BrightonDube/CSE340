@@ -208,23 +208,36 @@ validate.changePasswordRules = () => {
 validate.checkValidation = (req, res, next) => {
   const errors = validationResult(req);
   
-  if (!errors.isEmpty()) {
-    // Format errors for flash messages
-    const errorMessages = errors.array().map(error => error.msg);
-    req.flash('error', errorMessages[0]); // Show first error message
-    
-    // Store form data in session for sticky form
-    req.session.formData = req.body;
-    
-    // Redirect back to the form with error message
-    return res.redirect('back');
+  if (errors.isEmpty()) {
+    return next();
   }
   
-  // Clear any previous form data from session
-  if (req.session.formData) {
-    delete req.session.formData;
+  const errorList = errors.array().map(err => ({
+    param: err.param,
+    msg: err.msg,
+    value: err.value
+  }));
+  
+  console.log('Validation errors:', errorList); // Log validation errors
+  
+  // Set flash messages for each error
+  errorList.forEach(error => {
+    req.flash('error', error.msg);
+  });
+  
+  // Preserve form data
+  req.flash('formData', req.body);
+  
+  // For API requests, return JSON
+  if (req.xhr || req.originalUrl.startsWith('/api/')) {
+    return res.status(400).json({ 
+      success: false,
+      errors: errorList 
+    });
   }
   
+  // For web requests, redirect back with flash messages
+  return res.redirect('back');
   next();
 };
 

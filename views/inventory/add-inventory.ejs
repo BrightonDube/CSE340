@@ -286,6 +286,8 @@
   <div class="inventory-container">
     <div class="form-wrapper">
           <form action="/inv/add-inventory" method="post" id="inventoryForm">
+    <!-- CSRF Token -->
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
             
             <!-- Vehicle Information Section -->
             <div class="form-section">

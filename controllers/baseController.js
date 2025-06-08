@@ -12,13 +12,19 @@ baseController.addCommonVars = function(req, res, next) {
 };
 
 baseController.buildHome = async function (req, res) {
-  const nav = await utilities.getNav();
-  req.flash('notice', 'This is a flash message.');
-  res.render('index', { 
-    title: 'Home', 
-    nav,
-    styles: ['/css/header.css']
-  });
+  try {
+    const nav = await utilities.getNav();
+    // No need to pass messages here as they're handled by the middleware
+    res.render('index', { 
+      title: 'Home', 
+      nav,
+      styles: ['/css/header.css']
+    });
+  } catch (error) {
+    console.error('Error in buildHome:', error);
+    req.flash('error', 'Error loading the home page');
+    res.redirect('/');
+  }
 };
 
 module.exports = baseController;

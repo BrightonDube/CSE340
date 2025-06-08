@@ -20,6 +20,8 @@
   <div class="form-container">
     <div class="form-content">
       <form action="/inv/add-classification" method="post" id="classificationForm">
+    <!-- CSRF Token -->
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
         <div class="form-section">
           <div class="form-group">
             <label for="classification_name">Classification Name</label>

@@ -19,20 +19,33 @@ const accountRoute = require('./routes/accountRoute');
 const session = require('express-session');
 const pool = require('./database/');
 const { notFound, errorHandler, validationErrorHandler, databaseErrorHandler } = require('./utilities/error-handler');
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
+const csrf = require('csurf');
 
 /* ***********************
  * Middleware
  * ************************/
-// Body parser middleware
+// Body parser middleware - must come before any route that needs to read the request body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Cookie parser middleware - must come before session and csrf
+app.use(cookieParser());
+
+// Log all incoming requests - must come after body parser
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// Session middleware
 app.use(
   session({
     store: new (require('connect-pg-simple')(session))({
       createTableIfMissing: true,
       pool,
-      tableName: 'session'
+      tableName: 'session',
+      schemaName: 'public'
     }),
     secret: process.env.SESSION_SECRET || 'your_fallback_secret',
     resave: false,
@@ -47,8 +60,38 @@ app.use(
   })
 );
 
-// Cookie parser middleware
-app.use(cookieParser());
+// Simple CSRF protection
+app.use(csrf({ cookie: true }));
+
+// Make CSRF token available in all views
+app.use((req, res, next) => {
+  try {
+    res.locals._csrf = req.csrfToken ? req.csrfToken() : '';
+    next();
+  } catch (err) {
+    console.error('CSRF Token Error:', err);
+    next();
+  }
+});
+
+// Handle CSRF errors
+app.use((err, req, res, next) => {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err);
+  
+  console.error('CSRF Token Validation Failed:', err.message);
+  
+  // For API requests, return JSON
+  if (req.xhr || req.path.startsWith('/api/')) {
+    return res.status(403).json({ 
+      error: 'CSRF token validation failed'
+    });
+  }
+  
+  // For regular web requests, set flash message and redirect
+  req.flash('error', 'Your session expired or the form was invalid. Please try again.');
+  const redirectTo = req.get('referer') || '/account/login';
+  return res.redirect(redirectTo);
+});
 
 // JWT Token Validation
 app.use(Util.checkJWTToken);
@@ -56,16 +99,43 @@ app.use(Util.checkJWTToken);
 // Express Messages Middleware
 const flash = require('connect-flash');
 app.use(flash());
-app.use(function (req, res, next) {
-  res.locals.messages = require('express-messages')(req, res);
+app.use((req, res, next) => {
+  // Make flash messages available in all views
+  res.locals.messages = {
+    error: req.flash('error'),
+    success: req.flash('success'),
+    info: req.flash('info')
+  };
+  
+  // Make flash messages available in the template
+  res.locals.getMessages = () => {
+    const messages = {
+      error: req.flash('error'),
+      success: req.flash('success'),
+      info: req.flash('info')
+    };
+    req.flash('error', messages.error);
+    req.flash('success', messages.success);
+    req.flash('info', messages.info);
+    return messages;
+  };
+  
+  // Make req available in views
+  res.locals.req = req;
   next();
 });
 
-// Set up static directory
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Add common view variables (like styles) to all routes
 app.use(baseController.addCommonVars);
+
+// Log all requests for debugging - must come after body parser
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+  }
+  next();
+});
 
 // Make session and account data available to all templates
 app.use((req, res, next) => {
@@ -92,21 +162,21 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Set up views directory
 app.set('views', path.join(__dirname, 'views'));
 
-/* ***********************
- * View Engine and Templates
- *************************/
+// Set view engine and layout
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.set('layout', './layouts/layout'); // not at views root
+app.set('layout', './layouts/layout');
 
 /* ***********************
  * Routes
  *************************/
+// Static files route
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Use static route handler
 app.use(static);
 
 // Index route
