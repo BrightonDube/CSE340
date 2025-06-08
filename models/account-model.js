@@ -61,24 +61,25 @@ async function getAccountById(account_id) {
 /* **********************
  * Update account information
  * ********************* */
-async function updateAccount(account_id, account_firstname, account_lastname, account_email) {
+async function updateAccount(account_id, updates) {
   try {
-    const sql = `
-      UPDATE account 
-      SET account_firstname = $1, 
-          account_lastname = $2, 
-          account_email = $3
-      WHERE account_id = $4 
-      RETURNING *`;
-    
-    const result = await pool.query(sql, [
-      account_firstname,
-      account_lastname,
-      account_email,
-      account_id
-    ]);
-    
-    return result.rows[0];
+    if (!updates || Object.keys(updates).length === 0) {
+      // Nothing to update
+      return null;
+    }
+    // Build SET clause dynamically
+    const setClauses = [];
+    const values = [];
+    let idx = 1;
+    for (const [field, value] of Object.entries(updates)) {
+      setClauses.push(`${field} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
+    const sql = `UPDATE account SET ${setClauses.join(", ")} WHERE account_id = $${idx} RETURNING *`;
+    values.push(account_id);
+    const result = await pool.query(sql, values);
+    return result.rows[0] || null;
   } catch (error) {
     console.error("Error in updateAccount:", error);
     throw error;
@@ -109,6 +110,6 @@ module.exports = {
   checkExistingEmail, 
   getAccountByEmail,
   getAccountById,
-  updateAccount,
+  updateAccount, // now (account_id, updates)
   updatePassword
 }

@@ -325,22 +325,68 @@ async function buildUpdateAccount(req, res) {
 * *************************************** */
 async function updateAccount(req, res) {
   let nav = await utilities.getNav();
-  const { account_id, account_firstname, account_lastname, account_email } = req.body;
-  
+  const { account_id, account_firstname, account_lastname, account_email, original_email } = req.body;
+
   try {
-    const result = await accountModel.updateAccount(
-      account_id,
-      account_firstname,
-      account_lastname,
-      account_email
-    );
-    
-    if (result) {
-      // Update the user in the session
-      req.user.account_firstname = account_firstname;
-      req.user.account_lastname = account_lastname;
-      req.user.account_email = account_email;
-      
+    // 1. Fetch current account data from DB
+    const current = await accountModel.getAccountById(account_id);
+    if (!current) {
+      req.flash('error', 'Account not found.');
+      return res.redirect('/account/');
+    }
+
+    // 2. Whitelist fields to allow update
+    const allowedFields = ['account_firstname', 'account_lastname', 'account_email'];
+
+    // 3. Build updates object with only changed and allowed fields
+    const updates = {};
+    if (
+      typeof account_firstname === 'string' &&
+      account_firstname.trim() !== '' &&
+      account_firstname !== current.account_firstname
+    ) {
+      updates.account_firstname = account_firstname.trim();
+    }
+    if (
+      typeof account_lastname === 'string' &&
+      account_lastname.trim() !== '' &&
+      account_lastname !== current.account_lastname
+    ) {
+      updates.account_lastname = account_lastname.trim();
+    }
+    if (
+      typeof account_email === 'string' &&
+      account_email.trim() !== '' &&
+      account_email !== current.account_email
+    ) {
+      updates.account_email = account_email.trim();
+    }
+
+    // 4. If nothing changed, skip DB update
+    if (Object.keys(updates).length === 0) {
+      req.flash('notice', 'No changes detected.');
+      return res.redirect('/account/update/' + account_id);
+    }
+
+    // 5. Log attempted update for debugging
+    console.log('Attempting to update account_id', account_id, 'with:', updates);
+
+    // 6. Attempt DB update
+    const result = await accountModel.updateAccount(account_id, updates);
+    console.log('DB result for updateAccount:', result);
+
+    // 7. Check result before mutating session
+    if (result && typeof result === 'object') {
+      // Only update session fields that actually changed
+      if (req.session && req.session.user) {
+        for (const field of allowedFields) {
+          if (updates[field]) {
+            req.session.user[field] = updates[field];
+          }
+        }
+      }
+      // NOTE: To always have req.user populated, add middleware in server.js:
+      // app.use((req, res, next) => { if (req.session && req.session.user) { req.user = req.session.user; res.locals.user = req.session.user; } else { req.user = null; res.locals.user = null; } next(); });
       req.flash('success', 'Account updated successfully.');
       return res.redirect('/account/');
     } else {
@@ -353,6 +399,7 @@ async function updateAccount(req, res) {
     res.redirect('/account/update/' + account_id);
   }
 }
+
 
 /* ****************************************
 *  Build change password view

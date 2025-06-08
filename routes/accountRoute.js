@@ -60,6 +60,14 @@ router.get(
 
 // Process account update
 router.post(
+  '/update',
+  validate.updateProfileRules(),
+  validate.checkValidation,
+  validate.isAccountOwnerOrAdmin,
+  Util.handleErrors(accountController.updateAccount)
+);
+
+router.post(
   '/update-account',
   validate.updateProfileRules(),
   validate.checkValidation,

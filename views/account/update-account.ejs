@@ -35,6 +35,7 @@
     <form id="accountUpdateForm" action="/account/update" method="post" class="mb-8">
 
       <input type="hidden" name="account_id" id="account_id" value="<%= accountData.account_id %>">
+<input type="hidden" name="original_email" value="<%= accountData.account_email %>">
       
       <h2 class="text-xl font-semibold mb-4">Update Account Information</h2>
       
