@@ -35,6 +35,7 @@
     <h2>Update Account Information</h2>
     <form id="accountUpdateForm" action="/account/update" method="post" novalidate>
       <input type="hidden" name="account_id" value="<%= typeof accountData !== 'undefined' ? accountData.account_id : (typeof account !== 'undefined' ? account.account_id : '') %>">
+
       <input type="hidden" name="original_email" value="<%= typeof accountData !== 'undefined' ? accountData.account_email : (typeof account !== 'undefined' ? account.account_email : '') %>">
       <div class="form-group">
         <label for="account_firstname">First Name</label>

@@ -197,9 +197,12 @@ async function processLogin(req, res) {
       });
     }
     
+    // Log entered password and stored hash for debugging
+    console.log('[DEBUG] Login entered password:', account_password);
+    console.log('[DEBUG] Login stored hash:', account.account_password);
     // Compare passwords
     const passwordMatch = await bcrypt.compare(account_password, account.account_password);
-    console.log('Password match:', passwordMatch ? 'Yes' : 'No');
+    console.log('[DEBUG] bcrypt.compare result:', passwordMatch);
     
     if (!passwordMatch) {
       req.flash('error', 'Invalid email or password');
@@ -464,10 +467,13 @@ async function changePassword(req, res) {
       return res.redirect('/account/');
     }
 
-    // Hash the new password
+    // Log the new password and hashed password for debugging
+    console.log('[DEBUG] New password (plain):', new_password);
     const hashedPassword = await bcrypt.hash(new_password, 10);
+    console.log('[DEBUG] New password (hashed):', hashedPassword);
     // Update the password in the database
     const result = await accountModel.updatePassword(account_id, hashedPassword);
+    console.log('[DEBUG] Password update DB result:', result);
     if (result) {
       req.flash('success', 'Password updated successfully.');
       console.log('Flashed messages before redirect (success):', req.flash());
@@ -556,7 +562,12 @@ async function accountLogin(req, res) {
       })
     }
 
-    if (await bcrypt.compare(account_password, accountData.account_password)) {
+    // Log entered password and stored hash for debugging
+    console.log('[DEBUG] Login entered password:', account_password);
+    console.log('[DEBUG] Login stored hash:', accountData.account_password);
+    const passwordMatch = await bcrypt.compare(account_password, accountData.account_password);
+    console.log('[DEBUG] bcrypt.compare result:', passwordMatch);
+    if (passwordMatch) {
       // Prepare user data for session and JWT
       const userData = {
         account_id: accountData.account_id,
