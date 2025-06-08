@@ -171,6 +171,25 @@ async function processLogin(req, res) {
     };
     req.session.loggedin = true;
     
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        account_id: account.account_id,
+        account_type: account.account_type,
+        account_email: account.account_email
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: '1d' }
+    );
+    
+    // Set JWT in HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+    
     // Save session explicitly to ensure it's stored before redirect
     req.session.save(err => {
       if (err) {
@@ -351,7 +370,8 @@ async function logout(req, res) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    path: '/'
+    path: '/',
+    maxAge: 0 // Expire the cookie immediately
   });
 
   // Clear session data
