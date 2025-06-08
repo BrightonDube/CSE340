@@ -20,23 +20,39 @@
     
     <% if (account) { %>
       <section class="account-info">
-        <h2>Account Information</h2>
-        <div class="account-details">
-          <p><strong>First Name:</strong> <%= account.account_firstname %></p>
-          <p><strong>Last Name:</strong> <%= account.account_lastname %></p>
-          <p><strong>Email:</strong> <%= account.account_email %></p>
-          <p><strong>Account Type:</strong> <%= account.account_type %></p>
+        <!-- Welcome message for all users -->
+        <h2>Welcome <%= account.account_firstname %></h2>
+        
+        <!-- Update Account Link (visible to all users) -->
+        <div class="account-actions mt-4">
+          <a href="/account/update/<%= account.account_id %>" class="btn btn-primary">Update Account Information</a>
+          <a href="/account/change-password" class="btn btn-secondary ml-2">Change Password</a>
         </div>
         
-        <div class="account-actions">
-          <h3>Account Management</h3>
-          <ul>
-            <li><a href="/account/update/<%= account.account_id %>" class="btn btn-primary">Update Account Information</a></li>
-            <li><a href="/account/change-password" class="btn btn-secondary">Change Password</a></li>
-            <% if (account.account_type === 'Admin' || account.account_type === 'Employee') { %>
-              <li><a href="/inv" class="btn btn-info">Inventory Management</a></li>
-            <% } %>
-          </ul>
+        <!-- Inventory Management Section (only for Admin/Employee) -->
+        <% if (account.account_type === 'Admin' || account.account_type === 'Employee') { %>
+          <div class="inventory-management mt-4">
+            <h3>Inventory Management</h3>
+            <p><a href="/inv" class="btn btn-info">Manage Inventory</a></p>
+          </div>
+        <% } %>
+        
+        <!-- Account Details -->
+        <div class="account-details mt-4">
+          <h3>Account Details</h3>
+          <div class="details-grid">
+            <div><strong>First Name:</strong></div>
+            <div><%= account.account_firstname %></div>
+            
+            <div><strong>Last Name:</strong></div>
+            <div><%= account.account_lastname %></div>
+            
+            <div><strong>Email:</strong></div>
+            <div><%= account.account_email %></div>
+            
+            <div><strong>Account Type:</strong></div>
+            <div><%= account.account_type %></div>
+          </div>
         </div>
       </section>
     <% } else { %>
@@ -44,3 +60,74 @@
     <% } %>
   </div>
 </main>
+
+<style>
+  .account-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .account-info {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .details-grid {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .details-grid > div {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .details-grid > div:nth-child(odd) {
+    font-weight: 600;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background-color: #2563eb;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .btn-secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #4b5563;
+  }
+  
+  .btn-info {
+    background-color: #0284c7;
+    color: white;
+  }
+  
+  .btn-info:hover {
+    background-color: #0369a1;
+  }
+  
+  .mt-2 { margin-top: 0.5rem; }
+  .mt-4 { margin-top: 1rem; }
+  .ml-2 { margin-left: 0.5rem; }
+</style>
