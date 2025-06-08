@@ -1,0 +1,409 @@
+<%- include('../partials/head', { title: title }) %>
+
+<main class="form-container">
+  <!-- Form Header -->
+  <div class="form-header">
+    <h1><%= title %></h1>
+  </div>
+
+
+  <!-- Flash Messages -->
+  <% if (messages) { %>
+    <% Object.keys(messages).forEach(function (type) { %>
+      <div class="alert alert-<%= type %>">
+        <% messages[type].forEach(function (message) { %>
+          <p><%= message %></p>
+        <% }) %>
+      </div>
+    <% }) %>
+  <% } %>
+
+  <!-- Error Messages -->
+  <% if (errors && errors.length > 0) { %>
+    <div class="alert alert-error">
+      <h3>Please correct the following errors:</h3>
+      <ul>
+        <% errors.forEach(function(error) { %>
+          <li><%= error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <div class="form-body">
+    <!-- Account Update Form -->
+    <form id="accountUpdateForm" action="/account/update" method="post" class="mb-8">
+      <input type="hidden" name="account_id" id="account_id" value="<%= accountData.account_id %>">
+      
+      <h2 class="text-xl font-semibold mb-4">Update Account Information</h2>
+      
+      <div class="form-group">
+        <label for="account_firstname">First Name <span class="text-danger">*</span></label>
+        <input 
+          type="text" 
+          id="account_firstname" 
+          name="account_firstname" 
+          class="form-control <%= locals.errors && errors.account_firstname ? 'is-invalid' : '' %>" 
+          value="<%= accountData.account_firstname || '' %>" 
+          required
+        >
+        <% if (locals.errors && errors.account_firstname) { %>
+          <div class="invalid-feedback"><%= errors.account_firstname %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group">
+        <label for="account_lastname">Last Name <span class="text-danger">*</span></label>
+        <input 
+          type="text" 
+          id="account_lastname" 
+          name="account_lastname" 
+          class="form-control <%= locals.errors && errors.account_lastname ? 'is-invalid' : '' %>" 
+          value="<%= accountData.account_lastname || '' %>" 
+          required
+        >
+        <% if (locals.errors && errors.account_lastname) { %>
+          <div class="invalid-feedback"><%= errors.account_lastname %></div>
+        <% } %>
+      </div>
+
+      <div class="form-group">
+        <label for="account_email">Email Address <span class="text-danger">*</span></label>
+        <input 
+          type="email" 
+          id="account_email" 
+          name="account_email" 
+          class="form-control <%= locals.errors && errors.account_email ? 'is-invalid' : '' %>" 
+          value="<%= accountData.account_email || '' %>" 
+          required
+        >
+        <% if (locals.errors && errors.account_email) { %>
+          <div class="invalid-feedback"><%= errors.account_email %></div>
+        <% } %>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Update Account</button>
+        <a href="/account/" class="btn btn-secondary ml-2">Cancel</a>
+      </div>
+    </form>
+
+    <!-- Change Password Form -->
+    <form id="changePasswordForm" action="/account/change-password" method="post" class="mt-8">
+      <input type="hidden" name="account_id" id="password_account_id" value="<%= accountData.account_id %>">
+      
+      <div class="form-section">
+        <h2 class="text-xl font-semibold mb-4">Change Your Password</h2>
+        <p class="text-gray-600 mb-4">
+          Enter a new password below. This will replace your current password immediately.
+          Please ensure it meets the security requirements.
+        </p>
+        
+        <div class="form-group">
+          <label for="account_password">New Password <span class="text-danger">*</span></label>
+          <div class="password-field">
+            <input 
+              type="password" 
+              id="account_password" 
+              name="account_password" 
+              class="form-control <%= locals.errors && errors.account_password ? 'is-invalid' : '' %>"
+              required
+              minlength="8"
+              maxlength="50"
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              autocomplete="new-password"
+              aria-describedby="passwordHelp"
+            >
+            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          
+          <% if (locals.errors && errors.account_password) { %>
+            <div class="invalid-feedback"><%= errors.account_password %></div>
+          <% end %>
+          
+          <div id="passwordHelp" class="form-text text-muted">
+            <p class="mb-1">Your password must meet the following requirements:</p>
+            <ul class="list-disc pl-5 mt-1">
+              <li>At least 8 characters long</li>
+              <li>At least one uppercase letter (A-Z)</li>
+              <li>At least one lowercase letter (a-z)</li>
+              <li>At least one number (0-9)</li>
+              <li>Special characters are allowed but not required</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="account_confirm_password">Confirm New Password <span class="text-danger">*</span></label>
+          <div class="password-field">
+            <input 
+              type="password" 
+              id="account_confirm_password" 
+              name="account_confirm_password" 
+              class="form-control"
+              required
+              minlength="8"
+              maxlength="50"
+              autocomplete="new-password"
+              aria-describedby="passwordMatchHelp"
+            >
+            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div id="passwordMatchError" class="invalid-feedback d-none">
+            Passwords do not match. Please make sure both passwords are identical.
+          </div>
+          <div id="passwordMatchHelp" class="form-text text-muted">
+            Re-enter your new password to confirm it's correct.
+          </div>
+        </div>
+
+        <div class="form-actions mt-6">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-key mr-2"></i>Update Password
+          </button>
+          <a href="/account/" class="btn btn-outline-secondary ml-2">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script>
+  // Client-side form validation
+  document.addEventListener('DOMContentLoaded', function() {
+    // Password match validation
+    const password = document.getElementById('account_password');
+    const confirmPassword = document.getElementById('account_confirm_password');
+    const passwordMatchError = document.getElementById('passwordMatchError');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+
+    function validatePasswordMatch() {
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.classList.add('is-invalid');
+        passwordMatchError.classList.remove('d-none');
+        return false;
+      } else {
+        confirmPassword.classList.remove('is-invalid');
+        passwordMatchError.classList.add('d-none');
+        return true;
+      }
+    }
+
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    });
+
+    // Form submission handlers
+    if (changePasswordForm) {
+      changePasswordForm.addEventListener('submit', function(e) {
+        if (!validatePasswordMatch()) {
+          e.preventDefault();
+          return false;
+        }
+        return true;
+      });
+
+      // Real-time password match validation
+      confirmPassword.addEventListener('input', validatePasswordMatch);
+    }
+  });
+</script>
+
+<style>
+  .form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .form-header {
+    background-color: #4f46e5;
+    color: white;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .form-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .form-body {
+    padding: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #374151;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .form-control:focus {
+    border-color: #a5b4fc;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(199, 210, 254, 0.5);
+  }
+
+  .form-control.is-invalid {
+    border-color: #f87171;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc2626'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc2626' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+
+  .invalid-feedback {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc2626;
+  }
+
+  .form-text {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #6b7280;
+  }
+
+  .text-danger {
+    color: #dc2626;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-primary {
+    color: #fff;
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+
+  .btn-primary:hover {
+    background-color: #4338ca;
+    border-color: #4338ca;
+  }
+
+  .btn-secondary {
+    color: #374151;
+    background-color: #e5e7eb;
+    border-color: #e5e7eb;
+  }
+
+  .btn-secondary:hover {
+    background-color: #d1d5db;
+    border-color: #d1d5db;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+
+  .mb-8 {
+    margin-bottom: 2rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+  }
+
+  .alert-error {
+    color: #991b1b;
+    background-color: #fee2e2;
+    border-color: #fecaca;
+  }
+
+  .password-field {
+    position: relative;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+  }
+
+  .toggle-password:hover {
+    color: #4f46e5;
+  }
+
+  .d-none {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .form-container {
+      margin: 0;
+      border-radius: 0;
+      border: none;
+    }
+    
+    .form-body {
+      padding: 1rem;
+    }
+  }
+</style>
