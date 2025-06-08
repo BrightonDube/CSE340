@@ -26,59 +26,28 @@
         <% errors.forEach(function(error) { %>
           <li><%= error %></li>
         <% }) %>
-      </ul>
-    </div>
   <% } %>
 
-  <div class="form-body">
-    <!-- Account Update Form -->
-    <form id="accountUpdateForm" action="/account/update" method="post" class="mb-8">
+  <h1><%= title %></h1>
 
-      <input type="hidden" name="account_id" id="account_id" value="<%= accountData.account_id %>">
-<input type="hidden" name="original_email" value="<%= accountData.account_email %>">
-      
-      <h2 class="text-xl font-semibold mb-4">Update Account Information</h2>
-      
+  <!-- Account Update Form -->
+  <section class="form-section">
+    <h2>Update Account Information</h2>
+    <form id="accountUpdateForm" action="/account/update" method="post" novalidate>
+      <input type="hidden" name="account_id" value="<%= typeof accountData !== 'undefined' ? accountData.account_id : (typeof account !== 'undefined' ? account.account_id : '') %>">
+      <input type="hidden" name="original_email" value="<%= typeof accountData !== 'undefined' ? accountData.account_email : (typeof account !== 'undefined' ? account.account_email : '') %>">
       <div class="form-group">
-        <label for="account_firstname">First Name <span class="text-danger">*</span></label>
-        <input 
-          type="text" 
-          id="account_firstname" 
-          name="account_firstname" 
-          class="form-control <%= errors && errors.account_firstname ? 'is-invalid' : '' %>" 
-          value="<%= accountData.account_firstname || '' %>" 
-          required
-        >
-        <% if (errors && errors.account_firstname) { %>
-          <div class="invalid-feedback"><%= errors.account_firstname %></div>
-        <% } %>
+        <label for="account_firstname">First Name</label>
+        <input type="text" class="form-input" id="account_firstname" name="account_firstname" value="<%= typeof sticky !== 'undefined' && sticky.account_firstname ? sticky.account_firstname : (accountData ? accountData.account_firstname : (account ? account.account_firstname : '')) %>" required autocomplete="given-name">
       </div>
-
       <div class="form-group">
-        <label for="account_lastname">Last Name <span class="text-danger">*</span></label>
-        <input 
-          type="text" 
-          id="account_lastname" 
-          name="account_lastname" 
-          class="form-control <%= errors && errors.account_lastname ? 'is-invalid' : '' %>" 
-          value="<%= accountData.account_lastname || '' %>" 
-          required
-        >
-        <% if (errors && errors.account_lastname) { %>
-          <div class="invalid-feedback"><%= errors.account_lastname %></div>
-        <% } %>
+        <label for="account_lastname">Last Name</label>
+        <input type="text" class="form-input" id="account_lastname" name="account_lastname" value="<%= typeof sticky !== 'undefined' && sticky.account_lastname ? sticky.account_lastname : (accountData ? accountData.account_lastname : (account ? account.account_lastname : '')) %>" required autocomplete="family-name">
       </div>
 
       <div class="form-group">
         <label for="account_email">Email Address <span class="text-danger">*</span></label>
-        <input 
-          type="email" 
-          id="account_email" 
-          name="account_email" 
-          class="form-control <%= errors && errors.account_email ? 'is-invalid' : '' %>" 
-          value="<%= accountData.account_email || '' %>" 
-          required
-        >
+        <input type="email" class="form-input" id="account_email" name="account_email" value="<%= typeof sticky !== 'undefined' && sticky.account_email ? sticky.account_email : (accountData ? accountData.account_email : (account ? account.account_email : '')) %>" required autocomplete="email">
         <% if (errors && errors.account_email) { %>
           <div class="invalid-feedback"><%= errors.account_email %></div>
         <% } %>
@@ -107,9 +76,9 @@
           <div class="password-field">
             <input 
               type="password" 
+              class="form-input <%= locals.errors && errors.account_password ? 'is-invalid' : '' %>"
               id="account_password" 
               name="account_password" 
-              class="form-control <%= locals.errors && errors.account_password ? 'is-invalid' : '' %>"
               required
               minlength="8"
               maxlength="50"
@@ -145,7 +114,7 @@
               type="password" 
               id="account_confirm_password" 
               name="account_confirm_password" 
-              class="form-control"
+              class="form-input"
               required
               minlength="8"
               maxlength="50"
@@ -409,4 +378,53 @@
       padding: 1rem;
     }
   }
+.form-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #0001;
+}
+.form-header h1 {
+  margin-bottom: 1rem;
+}
+.form-section {
+  margin-bottom: 2rem;
+}
+.form-group {
+  margin-bottom: 1.5rem;
+}
+.form-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.form-input:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-secondary { background: #e5e7eb; color: #111; }
+.btn-secondary:hover { background: #cbd5e1; }
+.ml-2 { margin-left: 0.5rem; }
+.alert { padding: 1rem; margin-bottom: 1rem; border-radius: 4px; }
+.alert-error { background: #fee2e2; color: #b91c1c; }
+.invalid-feedback { color: #b91c1c; font-size: 0.95em; margin-top: 0.2em; }
 </style>

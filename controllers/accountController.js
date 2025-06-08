@@ -298,20 +298,23 @@ async function accountManagement(req, res) {
 async function buildUpdateAccount(req, res) {
   let nav = await utilities.getNav();
   const accountId = req.params.accountId || req.session.user.account_id;
-  
+
   try {
     const account = await accountModel.getAccountById(accountId);
-    
     if (!account) {
       req.flash('error', 'Account not found.');
       return res.redirect('/account/');
     }
-    
+    // Support sticky data and errors/messages from validation middleware
+    const sticky = req.body || {};
+    const messages = req.flash();
     res.render('account/update-account', {
       title: 'Update Account',
       nav,
-      errors: null,
-      account
+      errors: res.locals.errors || null,
+      messages,
+      account,
+      sticky
     });
   } catch (error) {
     console.error('Error building update account view:', error);
@@ -385,79 +388,92 @@ async function updateAccount(req, res) {
           }
         }
       }
-      // NOTE: To always have req.user populated, add middleware in server.js:
-      // app.use((req, res, next) => { if (req.session && req.session.user) { req.user = req.session.user; res.locals.user = req.session.user; } else { req.user = null; res.locals.user = null; } next(); });
       req.flash('success', 'Account updated successfully.');
       return res.redirect('/account/');
     } else {
-      req.flash('error', 'Failed to update account.');
-      return res.redirect('/account/update/' + account_id);
+      // On DB error, return to update view with sticky data and error
+      const account = await accountModel.getAccountById(account_id);
+      const messages = req.flash();
+      return res.status(400).render('account/update-account', {
+        title: 'Update Account',
+        nav,
+        errors: { update: 'Failed to update account.' },
+        messages,
+        account,
+        sticky: req.body
+      });
     }
   } catch (error) {
     console.error('Error updating account:', error);
-    req.flash('error', 'An error occurred while updating the account.');
-    res.redirect('/account/update/' + account_id);
+    // On error, return to update view with sticky data and error
+    let account = null;
+    try { account = await accountModel.getAccountById(account_id); } catch(e){}
+    const messages = req.flash();
+    return res.status(500).render('account/update-account', {
+      title: 'Update Account',
+      nav,
+      errors: { update: 'An error occurred while updating the account.' },
+      messages,
+      account,
+      sticky: req.body
+    });
   }
 }
 
 
-/* ****************************************
-*  Build change password view
-* *************************************** */
-async function buildChangePassword(req, res) {
-  let nav = await utilities.getNav();
-  res.render('account/change-password', {
-    title: 'Change Password',
-    nav,
-    errors: null
-  });
-}
 
 /* ****************************************
 *  Process password change
 * *************************************** */
 async function changePassword(req, res) {
-  const { current_password, new_password } = req.body;
-  const accountId = req.user.account_id;
-  
+  let nav = await utilities.getNav();
+  const { new_password, account_id } = req.body;
+
   try {
-    // Get the account to verify current password
-    const account = await accountModel.getAccountById(accountId);
-    
+    const account = await accountModel.getAccountById(account_id);
     if (!account) {
       req.flash('error', 'Account not found.');
-      return res.redirect('/account/change-password');
+      return res.redirect('/account/');
     }
-    
-    // Verify current password
-    const isMatch = await bcrypt.compare(current_password, account.account_password);
-    
-    if (!isMatch) {
-      req.flash('error', 'Current password is incorrect.');
-      return res.redirect('/account/change-password');
-    }
-    
+
     // Hash the new password
     const hashedPassword = await bcrypt.hash(new_password, 10);
-    
     // Update the password in the database
-    const result = await accountModel.updatePassword(accountId, hashedPassword);
-    
+    const result = await accountModel.updatePassword(account_id, hashedPassword);
     if (result) {
-      req.flash('success', 'Password updated successfully. Please log in again.');
-      
-      // Log the user out after password change
-      req.logout(() => {
-        res.redirect('/account/login');
-      });
+      req.flash('success', 'Password updated successfully.');
+      // Optionally, log user out after password change:
+      // req.session.destroy(() => res.redirect('/account/login'));
+      // For now, redirect to management view
+      return res.redirect('/account/');
     } else {
-      req.flash('error', 'Failed to update password.');
-      res.redirect('/account/change-password');
+      // On validation error, return to update view with sticky data and error
+      const messages = req.flash();
+      // Map errors to array of strings if needed
+      const errorList = Array.isArray(errors) ? errors.map(e => typeof e === 'string' ? e : e.msg) : (errors && errors.array ? errors.array().map(e => e.msg) : []);
+      return res.status(400).render('account/update-account', {
+        title: 'Update Account',
+        nav,
+        errors: errorList,
+        messages,
+        account,
+        sticky: req.body
+      });
     }
   } catch (error) {
     console.error('Error changing password:', error);
-    req.flash('error', 'An error occurred while changing the password.');
-    res.redirect('/account/change-password');
+    // On error, return to update view with sticky data and error
+    let account = null;
+    try { account = await accountModel.getAccountById(account_id); } catch(e){}
+    const messages = req.flash();
+    return res.status(500).render('account/update-account', {
+      title: 'Update Account',
+      nav,
+      errors: { password: 'An error occurred while changing the password.' },
+      messages,
+      account,
+      sticky: req.body
+    });
   }
 }
 
@@ -574,7 +590,6 @@ module.exports = {
   accountManagement, 
   buildUpdateAccount, 
   updateAccount, 
-  buildChangePassword, 
   changePassword,
   logout
 }

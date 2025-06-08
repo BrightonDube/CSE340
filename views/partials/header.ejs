@@ -3,17 +3,9 @@
     <a href="/" title="Return to home page">CSE Motors</a>
   </span>
   <div id="tools">
-    <% if (locals.isAuthenticated) { %>
-      <% if (locals.user) { %>
-        <a href="/account/" class="welcome-link">Welcome <%= user.account_firstname || 'User' %></a>
-        <a href="/account/logout" title="Logout">Logout</a>
-      <% } else if (locals.accountData) { %>
-        <a href="/account/" class="welcome-link">Welcome <%= accountData.account_firstname || 'User' %></a>
-        <a href="/account/logout" title="Logout">Logout</a>
-      <% } else { %>
-        <a href="/account/" class="welcome-link">Welcome User</a>
-        <a href="/account/logout" title="Logout">Logout</a>
-      <% } %>
+    <% if (user) { %>
+      <a href="/account/" class="welcome-link">Welcome <%= user.account_firstname || 'User' %></a>
+      <a href="/account/logout" title="Logout">Logout</a>
     <% } else { %>
       <a title="Click to log in" href="/account/login">My Account</a>
     <% } %>

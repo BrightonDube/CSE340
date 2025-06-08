@@ -53,6 +53,12 @@ router.get(
 
 // Update account details view
 router.get(
+  '/update',
+  Util.checkLogin,
+  Util.handleErrors(accountController.buildUpdateAccount)
+);
+
+router.get(
   '/update/:accountId', 
   validate.isAccountOwnerOrAdmin,
   Util.handleErrors(accountController.buildUpdateAccount)
@@ -75,11 +81,7 @@ router.post(
   Util.handleErrors(accountController.updateAccount)
 );
 
-// Change password view
-router.get(
-  '/change-password', 
-  Util.handleErrors(accountController.buildChangePassword)
-);
+
 
 // Process password change
 router.post(
