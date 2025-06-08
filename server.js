@@ -20,7 +20,7 @@ const session = require('express-session');
 const pool = require('./database/');
 const { notFound, errorHandler, validationErrorHandler, databaseErrorHandler } = require('./utilities/error-handler');
 const cookieParser = require("cookie-parser");
-const csrf = require('csurf');
+
 
 /* ***********************
  * Middleware
@@ -60,38 +60,8 @@ app.use(
   })
 );
 
-// Simple CSRF protection
-app.use(csrf({ cookie: true }));
 
-// Make CSRF token available in all views
-app.use((req, res, next) => {
-  try {
-    res.locals._csrf = req.csrfToken ? req.csrfToken() : '';
-    next();
-  } catch (err) {
-    console.error('CSRF Token Error:', err);
-    next();
-  }
-});
 
-// Handle CSRF errors
-app.use((err, req, res, next) => {
-  if (err.code !== 'EBADCSRFTOKEN') return next(err);
-  
-  console.error('CSRF Token Validation Failed:', err.message);
-  
-  // For API requests, return JSON
-  if (req.xhr || req.path.startsWith('/api/')) {
-    return res.status(403).json({ 
-      error: 'CSRF token validation failed'
-    });
-  }
-  
-  // For regular web requests, set flash message and redirect
-  req.flash('error', 'Your session expired or the form was invalid. Please try again.');
-  const redirectTo = req.get('referer') || '/account/login';
-  return res.redirect(redirectTo);
-});
 
 // JWT Token Validation
 app.use(Util.checkJWTToken);

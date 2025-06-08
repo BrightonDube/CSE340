@@ -12,14 +12,14 @@ require("dotenv").config()
 * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav();
-  // Pass CSRF token for use in the login form
+
   res.render("account/login", {
     title: "Login",
     nav,
     errors: null,
     account_email: null,
     message: null,
-    _csrf: req.csrfToken ? req.csrfToken() : (res.locals._csrf || '')
+
   });
 }
 

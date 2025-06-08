@@ -33,7 +33,7 @@
   <div class="form-body">
     <!-- Account Update Form -->
     <form id="accountUpdateForm" action="/account/update" method="post" class="mb-8">
-  <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
       <input type="hidden" name="account_id" id="account_id" value="<%= accountData.account_id %>">
       
       <h2 class="text-xl font-semibold mb-4">Update Account Information</h2>
@@ -91,7 +91,7 @@
 
     <!-- Change Password Form -->
     <form id="changePasswordForm" action="/account/change-password" method="post" class="mt-8">
-  <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
       <input type="hidden" name="account_id" id="password_account_id" value="<%= accountData.account_id %>">
       
       <div class="form-section">
@@ -123,7 +123,7 @@
           
           <% if (locals.errors && errors.account_password) { %>
             <div class="invalid-feedback"><%= errors.account_password %></div>
-          <% end %>
+          <% } %>
           
           <div id="passwordHelp" class="form-text text-muted">
             <p class="mb-1">Your password must meet the following requirements:</p>

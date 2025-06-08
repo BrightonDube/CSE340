@@ -38,9 +38,7 @@
     <% } %>
     
     <form action="/account/register" method="POST" class="registration-form" id="registerForm" enctype="application/x-www-form-urlencoded">
-      <% if (typeof _csrf !== 'undefined') { %>
-        <input type="hidden" name="_csrf" value="<%= _csrf %>">
-      <% } %>
+
       <div class="form-group">
         <label for="account_firstname">First Name</label>
         <input 
