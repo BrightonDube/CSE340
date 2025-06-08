@@ -6,7 +6,7 @@ require("dotenv").config();
 const validate = {};
 
 // Common validation patterns
-const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[\S]{12,}$/;
 const NAME_PATTERN = /^[A-Za-z\s-']+$/;
 const EMAIL_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'byui.edu'];
 

@@ -470,6 +470,7 @@ async function changePassword(req, res) {
     const result = await accountModel.updatePassword(account_id, hashedPassword);
     if (result) {
       req.flash('success', 'Password updated successfully.');
+      console.log('Flashed messages before redirect (success):', req.flash());
       // Optionally, log user out after password change:
       // req.session.destroy(() => res.redirect('/account/login'));
       // For now, redirect to management view
@@ -493,12 +494,13 @@ async function changePassword(req, res) {
     // On error, return to update view with sticky data and error
     let account = null;
     try { account = await accountModel.getAccountById(account_id); } catch(e){}
-    const messages = req.flash();
+    req.flash('error', 'An error occurred while changing the password.');
+    console.log('Flashed messages before render (server error):', req.flash());
     return res.status(500).render('account/update-account', {
       title: 'Update Account',
       nav,
-      errors: { password: 'An error occurred while changing the password.' },
-      messages,
+      errors: ['An error occurred while changing the password.'],
+      messages: req.flash(),
       account,
       sticky: req.body
     });
