@@ -62,9 +62,33 @@ app.use(function (req, res, next) {
 });
 
 // Set up static directory
-// Make session data available to all templates
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Add common view variables (like styles) to all routes
+app.use(baseController.addCommonVars);
+
+// Make session and account data available to all templates
 app.use((req, res, next) => {
+  // Set user data from session
   res.locals.user = req.session.user || null;
+  
+  // Set account data for the header
+  if (req.session.accountData) {
+    res.locals.accountData = req.session.accountData;
+  } else if (req.session.user) {
+    // Fallback to user data if accountData is not set
+    res.locals.accountData = {
+      account_id: req.session.user.account_id,
+      account_firstname: req.session.user.account_firstname,
+      account_lastname: req.session.user.account_lastname,
+      account_email: req.session.user.account_email,
+      account_type: req.session.user.account_type
+    };
+  }
+  
+  // Set isAuthenticated flag for easy checks
+  res.locals.isAuthenticated = !!(req.session.user && req.session.user.account_id);
+  
   next();
 });
 

@@ -162,6 +162,13 @@ async function processLogin(req, res) {
     // Set up session with user data
     delete account.account_password;
     req.session.user = account;
+    req.session.accountData = {  // Store account data for the header
+      account_id: account.account_id,
+      account_firstname: account.account_firstname,
+      account_lastname: account.account_lastname,
+      account_email: account.account_email,
+      account_type: account.account_type
+    };
     req.session.loggedin = true;
     
     // Save session explicitly to ensure it's stored before redirect

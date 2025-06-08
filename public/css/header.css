@@ -1,0 +1,61 @@
+/* Header Styles */
+#tools {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+#tools a {
+  color: #01579b; /* Primary color */
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.95rem;
+}
+
+#tools a:hover {
+  color: #002f6c; /* Darker shade for hover */
+  text-decoration: none;
+  background-color: #f5f5f5;
+}
+
+.welcome-link {
+  font-weight: 600 !important;
+  color: #242332 !important; /* Dark color for welcome text */
+}
+
+.welcome-link:hover {
+  color: #01579b !important; /* Primary color on hover */
+  background-color: transparent !important;
+}
+
+/* Logout button style */
+#tools a[title="Logout"] {
+  background-color: #f3f4f6;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+#tools a[title="Logout"]:hover {
+  background-color: #e5e7eb;
+  text-decoration: none;
+}
+
+/* My Account link style */
+#tools a[title^="Click to log in"] {
+  padding: 0.5rem 1rem;
+  background-color: #01579b;
+  color: white !important;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+#tools a[title^="Click to log in"]:hover {
+  background-color: #002f6c;
+  text-decoration: none;
+}
