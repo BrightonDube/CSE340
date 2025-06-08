@@ -328,6 +328,19 @@ async function buildUpdateAccount(req, res) {
 * *************************************** */
 async function updateAccount(req, res) {
   let nav = await utilities.getNav();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorList = errors.array().map(e => e.msg);
+    const account = await accountModel.getAccountById(req.body.account_id);
+    return res.status(400).render('account/update-account', {
+      title: 'Update Account',
+      nav,
+      errors: errorList,
+      messages: req.flash(),
+      account,
+      sticky: req.body
+    });
+  }
   const { account_id, account_firstname, account_lastname, account_email, original_email } = req.body;
 
   try {
@@ -425,8 +438,23 @@ async function updateAccount(req, res) {
 /* ****************************************
 *  Process password change
 * *************************************** */
+const { validationResult } = require('express-validator');
+
 async function changePassword(req, res) {
   let nav = await utilities.getNav();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorList = errors.array().map(e => e.msg);
+    const account = await accountModel.getAccountById(req.body.account_id);
+    return res.status(400).render('account/update-account', {
+      title: 'Update Account',
+      nav,
+      errors: errorList,
+      messages: req.flash(),
+      account,
+      sticky: req.body
+    });
+  }
   const { new_password, account_id } = req.body;
 
   try {

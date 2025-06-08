@@ -67,22 +67,45 @@
       <div class="form-section">
         <h2 class="text-xl font-semibold mb-4">Change Your Password</h2>
         <p class="text-gray-600 mb-4">
-          Enter a new password below. This will replace your current password immediately.
+          Enter your current password and a new password below. This will replace your current password immediately.
           Please ensure it meets the security requirements.
         </p>
         
         <div class="form-group">
-          <label for="account_password">New Password <span class="text-danger">*</span></label>
+          <label for="current_password">Current Password <span class="text-danger">*</span></label>
           <div class="password-field">
             <input 
               type="password" 
-              class="form-input <%= locals.errors && errors.account_password ? 'is-invalid' : '' %>"
-              id="account_password" 
-              name="account_password" 
+              class="form-input"
+              id="current_password" 
+              name="current_password" 
               required
               minlength="8"
-              maxlength="50"
-              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+              maxlength="100"
+              autocomplete="current-password"
+              aria-describedby="currentPasswordHelp"
+            >
+            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div id="currentPasswordHelp" class="form-text text-muted">
+            Enter your current password to authorize this change.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="new_password">New Password <span class="text-danger">*</span></label>
+          <div class="password-field">
+            <input 
+              type="password" 
+              class="form-input"
+              id="new_password" 
+              name="new_password" 
+              required
+              minlength="12"
+              maxlength="100"
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{12,}"
               autocomplete="new-password"
               aria-describedby="passwordHelp"
             >
@@ -90,34 +113,29 @@
               <i class="fas fa-eye"></i>
             </button>
           </div>
-          
-          <% if (locals.errors && errors.account_password) { %>
-            <div class="invalid-feedback"><%= errors.account_password %></div>
-          <% } %>
-          
           <div id="passwordHelp" class="form-text text-muted">
             <p class="mb-1">Your password must meet the following requirements:</p>
             <ul class="list-disc pl-5 mt-1">
-              <li>At least 8 characters long</li>
+              <li>At least 12 characters long</li>
               <li>At least one uppercase letter (A-Z)</li>
               <li>At least one lowercase letter (a-z)</li>
               <li>At least one number (0-9)</li>
-              <li>Special characters are allowed but not required</li>
+              <li>At least one special character (e.g. !@#$%^&*)</li>
             </ul>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="account_confirm_password">Confirm New Password <span class="text-danger">*</span></label>
+          <label for="confirm_password">Confirm New Password <span class="text-danger">*</span></label>
           <div class="password-field">
             <input 
               type="password" 
-              id="account_confirm_password" 
-              name="account_confirm_password" 
+              id="confirm_password" 
+              name="confirm_password" 
               class="form-input"
               required
-              minlength="8"
-              maxlength="50"
+              minlength="12"
+              maxlength="100"
               autocomplete="new-password"
               aria-describedby="passwordMatchHelp"
             >
