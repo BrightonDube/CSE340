@@ -5,6 +5,7 @@
   <div id="tools">
     <% if (user) { %>
       <a href="/account/" class="welcome-link">Welcome <%= user.account_firstname || 'User' %></a>
+      <a href="/favorites/" title="View my favorites">My Favorites</a>
       <a href="/account/logout" title="Logout">Logout</a>
     <% } else { %>
       <a title="Click to log in" href="/account/login">My Account</a>
