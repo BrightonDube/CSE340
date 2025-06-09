@@ -1,0 +1,24 @@
+<%# /views/favorites/my-favorites.ejs %>
+
+<% if (title) { %>
+    <h1><%= title %></h1>
+<% } else {
+    res.redirect('/')
+} %>
+
+<%- messages() %>
+
+<% if (errors) { %>
+    <ul class="notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+<% } %>
+
+<div class="favorites-container">
+    <%- grid %>
+</div>
+
+<%# Link to the JavaScript file we will create in the last step %>
+<script src="/js/favorites.js"></script>

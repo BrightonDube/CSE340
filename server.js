@@ -158,6 +158,10 @@ app.use('/inv', inventoryRoute);
 // Account routes
 app.use('/account', accountRoute);
 
+// Favorite routes
+app.use('/favorites', require('./routes/favoriteRoute'));
+
+
 // 404 Not Found Handler
 app.use(notFound);
 

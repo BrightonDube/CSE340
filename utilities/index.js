@@ -137,4 +137,32 @@ Util.checkLogin = (req, res, next) => {
   }
 }
 
+/* ****************************************
+ * Build the favorites view HTML
+ * ************************************ */
+Util.buildFavoritesGrid = async function(data) {
+  let grid;
+  if (data.length > 0) {
+    grid = '<ul id="fav-display">';
+    data.forEach(vehicle => {
+      grid += '<li>';
+      grid += '<a href="../../inv/detail/' + vehicle.inv_id + '" title="View ' + vehicle.inv_make + ' ' + vehicle.inv_model + ' details">';
+      grid += '<img src="' + vehicle.inv_thumbnail + '" alt="Image of ' + vehicle.inv_make + ' ' + vehicle.inv_model + ' on CSE Motors" />';
+      grid += '</a>';
+      grid += '<div class="namePrice">';
+      grid += '<hr />';
+      grid += '<h2>' + vehicle.inv_make + ' ' + vehicle.inv_model + '</h2>';
+      grid += '<span>$' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</span>';
+      grid += '</div>';
+      // Add a remove button for each favorite
+      grid += '<button class="remove-fav-btn" data-inv-id="' + vehicle.inv_id + '">Remove</button>';
+      grid += '</li>';
+    });
+    grid += '</ul>';
+  } else {
+    grid = '<p class="notice">You have no favorite vehicles yet.</p>';
+  }
+  return grid;
+};
+
 module.exports = Util
