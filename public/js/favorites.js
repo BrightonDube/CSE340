@@ -92,6 +92,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         if (data.success) {
           favBtn.innerHTML = action === "add" ? "♥ Remove from Favorites" : "♡ Add to Favorites";
+          // Update notes button state
+          const notesBtn = document.getElementById("notes-btn");
+          if (notesBtn) {
+            if (action === "add") {
+              notesBtn.disabled = false;
+              notesBtn.style.background = "#3a3a3a";
+              notesBtn.style.color = "#fff";
+              notesBtn.style.cursor = "pointer";
+              notesBtn.title = "";
+            } else {
+              notesBtn.disabled = true;
+              notesBtn.style.background = "#ccc";
+              notesBtn.style.color = "#888";
+              notesBtn.style.cursor = "not-allowed";
+              notesBtn.title = "Add to favorites first";
+            }
+          }
         } else {
           alert(data.message || "Could not update favorite status.");
         }
