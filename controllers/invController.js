@@ -3,6 +3,7 @@
  * **************************************** */
 const utilities = require("../utilities/");
 const invModel = require("../models/inventory-model");
+const favoriteModel = require("../models/favorite-model");
 
 const invCont = {};
 
@@ -40,28 +41,38 @@ invCont.buildByInventoryId = async function (req, res, next) {
   try {
     // Parse inv_id as an integer and validate it
     const inv_id = parseInt(req.params.inv_id, 10);
-    
+
     if (isNaN(inv_id)) {
       req.flash('notice', 'Invalid vehicle ID.');
       return res.redirect('/inv/');
     }
-    
+
     const data = await invModel.getInventoryById(inv_id);
-    
+
     // Check if data is empty or not found
     if (!data || data.length === 0) {
       req.flash('notice', 'Vehicle not found.');
       return res.redirect('/inv/');
     }
-    
+
     const detail = utilities.buildVehicleDetail(data[0]);
     const nav = await utilities.getNav();
-    
+
+    // ---- START FAVORITES LOGIC ----
+    let isFavorite = false;
+    if (res.locals.loggedin) {
+      const account_id = res.locals.accountData.account_id;
+      isFavorite = await favoriteModel.checkIfFavorite(account_id, inv_id);
+    }
+    // ---- END FAVORITES LOGIC ----
+
     res.render("./inventory/detail", {
       title: `${data[0].inv_make} ${data[0].inv_model}`,
       nav,
       detail,
-      message: req.flash('notice') || ''
+      message: req.flash('notice') || '',
+      inv_id,
+      isFavorite
     });
   } catch (error) {
     console.error('Error in buildByInventoryId:', error);

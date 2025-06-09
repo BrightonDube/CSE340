@@ -13,3 +13,36 @@
 
 <!-- Vehicle Detail Display -->
 <%- detail %>
+
+<%# Favorite Button Block %>
+<% if (locals.loggedin) { %>
+    <div class="favorite-action">
+        <button id="favorite-btn" data-inv-id="<%= inv_id %>">
+            <% if (isFavorite) { %>
+                ♥ Remove from Favorites
+            <% } else { %>
+                ♡ Add to Favorites
+            <% } %>
+        </button>
+    </div>
+<% } else { %>
+    <p class="notice">Please <a href="/account/login">log in</a> to add vehicles to your favorites.</p>
+<% } %>
+
+<style>
+  #favorite-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border: 2px solid #3a3a3a;
+    background-color: white;
+    border-radius: 5px;
+  }
+  #favorite-btn.favorited {
+    background-color: #ffdddd;
+    border-color: #ff4d4d;
+  }
+</style>
+
+<%# Link to the JavaScript file we will create in the last step %>
+<script src="/js/favorites.js"></script>
