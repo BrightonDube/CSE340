@@ -3,6 +3,77 @@
 // Handles favorite button toggles and removal without page reload
 
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Notes Modal Logic ---
+  const notesBtn = document.getElementById("notes-btn");
+  const notesModal = document.getElementById("notes-modal");
+  const notesModalClose = document.getElementById("notes-modal-close");
+  const notesForm = document.getElementById("notes-form");
+  const notesTextarea = document.getElementById("notes-textarea");
+  const notesError = document.getElementById("notes-error");
+  let notesInvId = null;
+
+  // Open notes modal
+  if (notesBtn && notesModal) {
+    notesBtn.addEventListener("click", () => {
+      notesInvId = notesBtn.dataset.invId;
+      // Optionally fetch existing notes for this favorite (if desired)
+      notesTextarea.value = notesBtn.getAttribute('data-current-notes') || '';
+      notesModal.style.display = "flex";
+      notesError.style.display = "none";
+      notesError.textContent = "";
+    });
+  }
+  // Close modal
+  if (notesModalClose && notesModal) {
+    notesModalClose.addEventListener("click", () => {
+      notesModal.style.display = "none";
+    });
+  }
+  // Close modal on outside click
+  if (notesModal) {
+    notesModal.addEventListener("click", (e) => {
+      if (e.target === notesModal) {
+        notesModal.style.display = "none";
+      }
+    });
+  }
+  // Notes form submit
+  if (notesForm) {
+    notesForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const notes = notesTextarea.value.trim();
+      const inv_id = notesInvId || notesForm.elements['inv_id'].value;
+      // Client-side validation
+      if (notes.length > 1000) {
+        notesError.textContent = "Notes must be less than 1000 characters.";
+        notesError.style.display = "block";
+        return;
+      }
+      notesError.style.display = "none";
+      notesError.textContent = "";
+      // AJAX POST
+      try {
+        const res = await fetch("/favorites/update-notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ inv_id, notes })
+        });
+        const data = await res.json();
+        if (data.success) {
+          notesModal.style.display = "none";
+          // Reload the page to display flash message
+          location.reload();
+        } else {
+          notesError.textContent = data.message || "Could not save notes.";
+          notesError.style.display = "block";
+        }
+      } catch (err) {
+        notesError.textContent = "An error occurred. Please try again.";
+        notesError.style.display = "block";
+      }
+    });
+  }
+
   // --- Detail Page Favorite Button ---
   const favBtn = document.getElementById("favorite-btn");
   if (favBtn) {

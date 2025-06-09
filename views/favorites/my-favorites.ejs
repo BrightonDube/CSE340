@@ -52,12 +52,63 @@
 
 <style>
 .grid-favorites {
+  padding: 2rem 0;
+}
+#fav-display {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: 2rem;
-  padding: 2rem 0;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
+#fav-display li {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 1.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+  position: relative;
+  min-width: 0;
+}
+#fav-display li:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+}
+#fav-display img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+#fav-display .namePrice {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.remove-fav-btn, .remove-btn-modal {
+  background: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 0.5em;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 5px rgba(255,77,77,0.1);
+}
+.favorite-notes {
+  background:#f5f5f5;
+  border-radius:5px;
+  padding:0.5em 1em;
+  margin:0.5em 0;
+  color:#333;
+  font-size:0.97em;
+  width: 100%;
+  word-break: break-word;
+}
+
 .grid-favorites ul, .grid-favorites li {
   list-style: none;
   margin: 0;

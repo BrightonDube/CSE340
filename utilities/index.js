@@ -154,6 +154,10 @@ Util.buildFavoritesGrid = async function(data) {
       grid += '<h2>' + vehicle.inv_make + ' ' + vehicle.inv_model + '</h2>';
       grid += '<span>$' + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</span>';
       grid += '</div>';
+      if (vehicle.notes && vehicle.notes.trim().length > 0) {
+        grid += '<div class="favorite-notes" style="background:#f5f5f5; border-radius:5px; padding:0.5em 1em; margin:0.5em 0; color:#333; font-size:0.97em;">';
+        grid += '<strong>Notes:</strong><br>' + vehicle.notes + '</div>';
+      }
       // Add a remove button for each favorite
       grid += '<button class="remove-fav-btn" data-inv-id="' + vehicle.inv_id + '">Remove</button>';
       grid += '</li>';

@@ -16,7 +16,7 @@
 
 <%# Favorite Button Block %>
 <% if (locals.loggedin) { %>
-    <div class="favorite-action">
+    <div class="favorite-action" style="display: flex; gap: 1rem; align-items: center;">
         <button id="favorite-btn" data-inv-id="<%= inv_id %>">
             <% if (isFavorite) { %>
                 ♥ Remove from Favorites
@@ -24,6 +24,25 @@
                 ♡ Add to Favorites
             <% } %>
         </button>
+        <% if (isFavorite) { %>
+          <button id="notes-btn" type="button" data-inv-id="<%= inv_id %>" style="background: #3a3a3a; color: #fff; border-radius: 5px; padding: 10px 20px; border: none; cursor: pointer;">Add/Edit Notes</button>
+        <% } else { %>
+          <button id="notes-btn" type="button" data-inv-id="<%= inv_id %>" style="background: #ccc; color: #888; border-radius: 5px; padding: 10px 20px; border: none; cursor: not-allowed;" disabled title="Add to favorites first">Add/Edit Notes</button>
+        <% } %>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+      <div class="modal-content" style="background:#fff; padding:2rem; border-radius:10px; max-width:400px; width:90%; position:relative;">
+        <span class="modal-close" id="notes-modal-close" style="position:absolute; top:10px; right:15px; font-size:1.5em; cursor:pointer;">&times;</span>
+        <h2 style="margin-top:0;">Add/Edit Notes</h2>
+        <form id="notes-form">
+          <textarea id="notes-textarea" name="notes" rows="6" maxlength="1000" placeholder="Add your notes here..." style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; font-size:1em; resize:vertical;"></textarea>
+          <input type="hidden" name="inv_id" value="<%= inv_id %>" />
+          <div id="notes-error" style="color:#c00; margin:0.5em 0 0 0; display:none;"></div>
+          <button type="submit" id="notes-submit-btn" style="margin-top:1em; background:#3a3a3a; color:#fff; border:none; border-radius:5px; padding:10px 20px; font-size:1em; cursor:pointer;">Save Notes</button>
+        </form>
+      </div>
     </div>
 <% } else { %>
     <p class="notice">Please <a href="/account/login">log in</a> to add vehicles to your favorites.</p>

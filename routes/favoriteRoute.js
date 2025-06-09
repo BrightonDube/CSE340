@@ -25,4 +25,11 @@ router.post(
   Util.handleErrors(favController.removeFavorite)
 );
 
+// Route to handle updating notes for a favorite
+router.post(
+  "/update-notes",
+  Util.checkLogin,
+  Util.handleErrors(favController.updateFavoriteNotes)
+);
+
 module.exports = router;

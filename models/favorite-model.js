@@ -5,13 +5,18 @@ const pool = require("../database/");
 /* ***************************
  *  Add a vehicle to a user's favorites
  * ************************** */
-async function addToFavorites(account_id, inv_id) {
+async function addToFavorites(account_id, inv_id, notes = "") {
   try {
+    // Sanitize notes (remove HTML tags)
+    if (typeof notes !== 'string') notes = '';
+    // Remove any HTML tags (simple regex)
+    notes = notes.replace(/<[^>]*>/g, '');
+    if (notes.length > 1000) notes = notes.slice(0, 1000);
     const sql = `
-      INSERT INTO public.favorites (account_id, inv_id)
-      VALUES ($1, $2)
+      INSERT INTO public.favorites (account_id, inv_id, notes)
+      VALUES ($1, $2, $3)
       RETURNING *`;
-    const result = await pool.query(sql, [account_id, inv_id]);
+    const result = await pool.query(sql, [account_id, inv_id, notes]);
     return result.rows[0];
   } catch (error) {
     // Unique constraint violation (duplicate favorite)
@@ -75,9 +80,29 @@ async function checkIfFavorite(account_id, inv_id) {
   }
 }
 
+async function updateFavoriteNotes(account_id, inv_id, notes) {
+  try {
+    if (typeof notes !== 'string') notes = '';
+    if (notes.length > 1000) notes = notes.slice(0, 1000);
+    const sql = `
+      UPDATE public.favorites SET notes = $3
+      WHERE account_id = $1 AND inv_id = $2
+      RETURNING *`;
+    const result = await pool.query(sql, [account_id, inv_id, notes]);
+    if (result.rowCount === 0) {
+      return { error: "Favorite not found." };
+    }
+    return result.rows[0];
+  } catch (error) {
+    console.error("updateFavoriteNotes error: " + error);
+    return { error: error.message };
+  }
+}
+
 module.exports = {
   addToFavorites,
   removeFavorite,
   getFavoritesByAccount,
   checkIfFavorite,
+  updateFavoriteNotes,
 };
